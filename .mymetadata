@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project-module
+  type="WEB"
+  name="HttpUploader7SQL"
+  id="myeclipse.1437013422555"
+  context-root="/HttpUploader7SQL"
+  j2ee-spec="5.0"
+  archive="HttpUploader7SQL.war">
+  <attributes>
+    <attribute name="webrootdir" value="WebRoot" />
+  </attributes>
+</project-module>
+

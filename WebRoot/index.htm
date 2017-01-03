@@ -1,0 +1,28 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" >
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>HttpUploader7-云存储-SQL演示</title>
+    <link href="js/up7.css" type="text/css" rel="Stylesheet"/>
+    <script type="text/javascript" src="js/jquery-1.4.min.js"></script>
+    <script type="text/javascript" src="js/json2.min.js"></script>
+    <script type="text/javascript" src="js/up7.js" charset="utf-8" ></script>    
+    <script language="javascript" type="text/javascript">
+    	var cbMgr = new HttpUploaderMgr();
+		cbMgr.event.md5Complete = function (obj, md5) { /*alert(md5);*/ };
+        cbMgr.event.fileComplete = function (obj) { /*alert(obj.pathSvr);*/ };
+
+    	cbMgr.Fields["test"] = "test";
+
+    	$(document).ready(function()
+    	{
+    		cbMgr.LoadTo("FilePanel");
+        	cbMgr.SetupCheck();//安装检查
+        });
+    </script>
+</head>
+<body>
+	<a href="db/clear.jsp" target="_blank">清空数据库</a>
+	<div id="FilePanel"></div>
+</body>
+</html>
