@@ -31,6 +31,8 @@ DBFile db = new DBFile();
 //文件不存在
 if(!db.GetFileInfByFid(Integer.parseInt(fid),inf))
 {
+	response.addHeader("Content-Range","0-0/0");
+	response.addHeader("Content-Length","0");
 	return;
 }
 File f = new File(inf.pathSvr);
