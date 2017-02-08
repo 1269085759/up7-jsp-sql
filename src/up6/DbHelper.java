@@ -9,7 +9,7 @@ public class DbHelper {
 	String m_curPath;
 	public String m_dbUser = "sa";				//SQL Server帐号
 	public String m_dbPass = "123456";			//SQL Server密码
-	public String m_dbTable = "HttpUploader6";	//SQL Server数据库名称
+	public String m_dbTable = "up7";	//SQL Server数据库名称
 
 	public DbHelper()
 	{
