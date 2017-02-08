@@ -1,5 +1,6 @@
 package up6.model;
 import java.util.Date;
+import java.util.UUID;
 
 /*
  * 原型
@@ -16,6 +17,8 @@ public class xdb_files {
 	public xdb_files()
 	{
 		this.complete = false;
+		this.sign = UUID.randomUUID().toString();
+		this.sign = this.sign .replace("-", "");
 	}
 
 	//数据表唯一ID
@@ -125,20 +128,22 @@ public class xdb_files {
 	public void setLenSvr(long lenSvr) {
 		this.lenSvr = lenSvr;
 	}
-	public String getPerSvr() {	return perSvr;}
-	public void setPerSvr(String perSvr) {this.perSvr = perSvr;}
-	public boolean isComplete() {return complete;}
-	public void setComplete(boolean complete) {	this.complete = complete;}
-	public Date getPostedTime() {return PostedTime;}
-	public void setPostedTime(Date postedTime) {PostedTime = postedTime;}
-	public boolean isDeleted() {return deleted;}
-	public void setDeleted(boolean deleted) {this.deleted = deleted;}
-	public String getFd_json() {return fd_json;	}
-	public void setFd_json(String fdJson) {fd_json = fdJson;}
-	public int getFilesCount() {return filesCount;}
-	public void setFilesCount(int filesCount) {this.filesCount = filesCount;}
-	public int getFilesComplete() {return filesComplete;}
-	public void setFilesComplete(int filesComplete) {this.filesComplete = filesComplete;	}
+	public void 	setSign(String v){this.sign = v;}
+	public String 	getSign(){return this.sign;}
+	public String 	getPerSvr() {	return perSvr;}
+	public void 	setPerSvr(String perSvr) {this.perSvr = perSvr;}
+	public boolean 	isComplete() {return complete;}
+	public void 	setComplete(boolean complete) {	this.complete = complete;}
+	public Date 	getPostedTime() {return PostedTime;}
+	public void 	setPostedTime(Date postedTime) {PostedTime = postedTime;}
+	public boolean 	isDeleted() {return deleted;}
+	public void 	setDeleted(boolean deleted) {this.deleted = deleted;}
+	public String 	getFd_json() {return fd_json;	}
+	public void 	setFd_json(String fdJson) {fd_json = fdJson;}
+	public int 		getFilesCount() {return filesCount;}
+	public void 	setFilesCount(int filesCount) {this.filesCount = filesCount;}
+	public int 		getFilesComplete() {return filesComplete;}
+	public void 	setFilesComplete(int filesComplete) {this.filesComplete = filesComplete;	}
 
 	//根级文件夹ID
     public int pidRoot=0;	
@@ -176,6 +181,7 @@ public class xdb_files {
 	public boolean complete=false;
 	public Date PostedTime = new Date();
 	public boolean deleted=false;
+	public String sign = "";
 	/**	 * 文件夹JSON信息	 */
 	public String fd_json="";	
 	public int filesCount=0;//add(2015-03-18):供JS调用
