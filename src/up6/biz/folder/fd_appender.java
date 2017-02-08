@@ -85,13 +85,6 @@ public class fd_appender
         for(int i = 0 , l = this.m_root.files.size();i<l;++i)
         {
         	fd_file f = this.m_root.files.get(i);
-        	//文件不存在
-        	if(!PathTool.exist(f.pathSvr))
-        	{
-            	FileBlockWriter fr = new FileBlockWriter();
-            	fr.make(f.pathSvr);        		
-        	}
-        		
             this.update_file(f);
         }
         this.update_file(this.m_root);
