@@ -316,7 +316,7 @@ public class fd_appender
     void pre_update_files() throws SQLException
     {
         StringBuilder sb = new StringBuilder();
-        sb.append("update up6_files set");
+        sb.append("update up7_files set");
         sb.append(" f_pid=?");
         sb.append(",f_pidRoot=?");
         sb.append(",f_fdTask=?");
