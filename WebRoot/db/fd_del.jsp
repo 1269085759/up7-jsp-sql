@@ -1,4 +1,4 @@
-<%@ page language="java" import="up6.DBFolder" pageEncoding="UTF-8"%><%@
+<%@ page language="java" import="up7.DBFolder" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@ 
 	page import="org.apache.commons.lang.StringUtils" %><%
 /*

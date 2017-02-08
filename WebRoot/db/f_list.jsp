@@ -1,7 +1,7 @@
-<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%><%@
+<%@ page language="java" import="up7.DBFile" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="up6.XDebug" %><%@
-	page import="up6.biz.*" %><%@
+	page import="up7.XDebug" %><%@
+	page import="up7.biz.*" %><%@
 	page import="org.apache.commons.lang.StringUtils" %><%@
 	page import="java.net.URLEncoder" %><%
 /*
