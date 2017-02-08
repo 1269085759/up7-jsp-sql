@@ -50,30 +50,23 @@ fileSvr.nameSvr = fileSvr.nameLoc;
 PathGuidBuilder pb = new PathGuidBuilder();
 fileSvr.pathSvr = pb.genFile(fileSvr.uid,fileSvr);
 
-	DBFile db = new DBFile();
-	xdb_files fileExist = new xdb_files();
-	
-	boolean exist = db.exist_file(md5,fileExist);
-	//数据库已存在相同文件，且有上传进度，则直接使用此信息
-	if(exist && fileExist.lenSvr > 1)
-	{
-		fileSvr.pathSvr 		= fileExist.pathSvr;
-		fileSvr.perSvr 			= fileExist.perSvr;
-		fileSvr.lenSvr 			= fileExist.lenSvr;
-		fileSvr.complete		= fileExist.complete;
-		fileSvr.idSvr 			= db.Add(fileSvr);
-	}//此文件不存在
-	else
-	{
-		fileSvr.idSvr = db.Add(fileSvr);
-		
-		FileResumerPart fr = new FileResumerPart();
-		fr.CreateFile(fileSvr.pathSvr);		
-	}
+//添加记录
+DBFile db = new DBFile();	
+fileSvr.idSvr = db.Add(fileSvr);
 
-JSONObject obj = JSONObject.fromObject(fileSvr);
-String json = obj.toString();
-json = URLEncoder.encode(json,"UTF-8");//编码，防止中文乱码
-json = json.replace("+","%20");
-json = callback + "({\"value\":\"" + json + "\"})";//返回jsonp格式数据。
-out.write(json);%>
+//创建文件
+FileBlockWriter fr = new FileBlockWriter();
+Boolean ret = fr.make(fileSvr.pathSvr,fileSvr.lenLoc);		
+if(!ret)
+{
+	out.write(callback + "({\"value\":null,\"err\":true,\"inf\":\"创建文件错误，请检查存储路径是否正确，磁盘空间是否不足。\"})");
+}
+else
+{
+	JSONObject obj = JSONObject.fromObject(fileSvr);
+	String json = obj.toString();
+	json = URLEncoder.encode(json,"UTF-8");//编码，防止中文乱码
+	json = json.replace("+","%20");
+	json = callback + "({\"value\":\"" + json + "\"})";//返回jsonp格式数据。
+	out.write(json);
+}%>

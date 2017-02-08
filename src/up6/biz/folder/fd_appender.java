@@ -14,7 +14,7 @@ import java.util.Map;
 import org.apache.commons.lang.StringUtils;
 
 import up6.DbHelper;
-import up6.FileResumerPart;
+import up6.FileBlockWriter;
 import up6.PathTool;
 import up6.XDebug;
 import up6.biz.PathBuilder;
@@ -88,8 +88,8 @@ public class fd_appender
         	//文件不存在
         	if(!PathTool.exist(f.pathSvr))
         	{
-            	FileResumerPart fr = new FileResumerPart();
-            	fr.CreateFile(f.pathSvr);        		
+            	FileBlockWriter fr = new FileBlockWriter();
+            	fr.make(f.pathSvr);        		
         	}
         		
             this.update_file(f);

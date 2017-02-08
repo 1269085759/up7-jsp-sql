@@ -1,6 +1,6 @@
 <%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="up6.FileResumerPart" %><%@
+	page import="up6.FileBlockWriter" %><%@
 	page import="up6.XDebug" %><%@
 	page import="org.apache.commons.fileupload.FileItem" %><%@
 	page import="org.apache.commons.fileupload.FileItemFactory" %><%@
@@ -10,8 +10,7 @@
 	page import="org.apache.commons.lang.StringUtils" %><%@
 	page import="java.net.URLDecoder"%><%@ 
 	page import="java.util.Iterator"%><%@ 
-	page import="java.util.List"%><%
-/*
+	page import="java.util.List"%><%/*
 	此页面负责将文件块数据写入文件中。
 	此页面一般由控件负责调用
 	参数：
@@ -128,7 +127,7 @@ if ( 	StringUtils.isBlank( lenSvr )
 	XDebug.Output("fd_perSvr",fd_perSvr);
 	
 	//保存文件块数据
-	FileResumerPart res = new FileResumerPart();
+	FileBlockWriter res = new FileBlockWriter();
 	res.m_RangePos = Long.parseLong(f_pos);
 	res.SaveFileRange(rangeFile, pathSvr);
 	
@@ -148,6 +147,4 @@ if ( 	StringUtils.isBlank( lenSvr )
 		db.f_process(Integer.parseInt(uid),Integer.parseInt(idSvr),Long.parseLong(f_pos),Long.parseLong(lenSvr),perSvr);		
 	}
 			
-	out.write("ok");
-
-%>
+	out.write("ok");%>
