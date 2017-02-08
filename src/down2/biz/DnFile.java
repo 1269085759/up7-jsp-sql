@@ -19,7 +19,7 @@ public class DnFile
 	 */
 	public down2.model.DnFileInf Find(int fid)
 	{		
-		String sql = "select * from down_files where f_id=?";
+		String sql = "select * from down3_files where f_id=?";
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
 		try
@@ -50,7 +50,7 @@ public class DnFile
     {
     	int idSvr = 0;
         StringBuilder sb = new StringBuilder();
-        sb.append("insert into down_files(");        
+        sb.append("insert into down3_files(");        
         sb.append(" f_uid");
         sb.append(",f_nameLoc");
         sb.append(",f_pathLoc");
@@ -93,7 +93,7 @@ public class DnFile
     {
     	int idSvr = 0;
         StringBuilder sb = new StringBuilder();
-        sb.append("insert into down_files(");        
+        sb.append("insert into down3_files(");        
         sb.append(" f_uid");
         sb.append(",f_mac");
         sb.append(",f_pathLoc");
@@ -128,7 +128,7 @@ public class DnFile
     public void Complete(int fid)
     {
 		DbHelper db = new DbHelper();
-		PreparedStatement cmd = db.GetCommand("update down_files set f_complete=1 where f_id=?");
+		PreparedStatement cmd = db.GetCommand("update down3_files set f_complete=1 where f_id=?");
 		try
 		{
 			cmd.setInt(1,fid);
@@ -146,7 +146,7 @@ public class DnFile
     /// <param name="fid"></param>
     public void Delete(int fid,int uid,String mac)
     {
-        String sql = "delete from down_files where f_id=? and f_uid=? and f_mac=?";
+        String sql = "delete from down3_files where f_id=? and f_uid=? and f_mac=?";
         DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
 
@@ -162,7 +162,7 @@ public class DnFile
     
     public static void Delete(String fid,String uid)
     {
-        String sql = "delete from down_files where f_id=? and f_uid=?";
+        String sql = "delete from down3_files where f_id=? and f_uid=?";
         DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
 
@@ -178,7 +178,7 @@ public class DnFile
     //删除文件夹的所有子文件
     public static void delFiles(String pidRoot,String uid)
     {
-        String sql = "delete from down_files where f_pidRoot=? and f_uid=?";
+        String sql = "delete from down3_files where f_pidRoot=? and f_uid=?";
         DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
 
@@ -200,7 +200,7 @@ public class DnFile
      */
     public void updateProcess(int fid,int uid,String lenLoc,String perLoc)
     {
-        String sql = "update down_files set f_lenLoc=?,f_perLoc=? where f_id=? and f_uid=?";
+        String sql = "update down3_files set f_lenLoc=?,f_perLoc=? where f_id=? and f_uid=?";
         DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
 
@@ -222,7 +222,7 @@ public class DnFile
     public static void Clear()
     {
 		DbHelper db = new DbHelper();
-		db.ExecuteNonQuery("truncate table down_files");
+		db.ExecuteNonQuery("truncate table down3_files");
 		//db.ExecuteNonQuery("truncate table hup_folders");
     }
 }

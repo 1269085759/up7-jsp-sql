@@ -36,7 +36,7 @@ public class folder_appender
         rs.close();        
 
         StringBuilder sb = new StringBuilder();
-        sb.append("update down_files set");
+        sb.append("update down3_files set");
         sb.append(" f_nameLoc=?");
         sb.append(",f_pathLoc=?");
         sb.append(",f_fileUrl=?");
