@@ -1,38 +1,50 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
+<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="Xproer.*" %><%@ 
-	page import="org.apache.commons.lang.*" %><%@ 
-	page import="java.net.URLDecoder" %><%@ 
-	page import="java.net.URLEncoder" %><%@ 
-	page import="org.apache.commons.fileupload.*" %><%@ 
-	page import="org.apache.commons.fileupload.disk.*" %><%@ 
-	page import="org.apache.commons.fileupload.servlet.*" %><%@
-	page import="java.io.*" %><%
+	page import="up6.FileResumerPart" %><%@
+	page import="up6.XDebug" %><%@
+	page import="org.apache.commons.fileupload.FileItem" %><%@
+	page import="org.apache.commons.fileupload.FileItemFactory" %><%@
+	page import="org.apache.commons.fileupload.FileUploadException" %><%@
+	page import="org.apache.commons.fileupload.disk.DiskFileItemFactory" %><%@
+	page import="org.apache.commons.fileupload.servlet.ServletFileUpload" %><%@
+	page import="org.apache.commons.lang.StringUtils" %><%@
+	page import="java.net.URLDecoder"%><%@ 
+	page import="java.util.Iterator"%><%@ 
+	page import="java.util.List"%><%
 /*
 	此页面负责将文件块数据写入文件中。
 	此页面一般由控件负责调用
 	参数：
 		uid
-		fid
+		idSvr
 		md5
-		fileSize
-		rangePos
+		lenSvr
+		pathSvr
+		RangePos
+		fd_idSvr
+		fd_lenSvr
 	更新记录：
 		2012-04-12 更新文件大小变量类型，增加对2G以上文件的支持。
 		2012-04-18 取消更新文件上传进度信息逻辑。
 		2012-10-25 整合更新文件进度信息功能。减少客户端的AJAX调用。
 		2014-07-23 优化代码。
 		2015-03-19 客户端提供pathSvr，此页面减少一次访问数据库的操作。
+		2016-04-09 优化文件存储逻辑，增加更新文件夹进度逻辑
 */
 //String path = request.getContextPath();
 //String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
-String struid 		= "";// 		= request.getParameter("uid");
-String strfid 		= "";// 		= request.getParameter("fid");
+String uid 			= "";// 		= request.getParameter("uid");
+String idSvr 		= "";// 		= request.getParameter("fid");
 String md5 			= "";// 			= request.getParameter("md5");
-String strFileSize 	= "";// 	= request.getParameter("FileSize");
-String strRangePos 	= "";// 	= request.getParameter("RangePos");
+String perSvr 		= "";
+String lenSvr		= "";
+String lenLoc		= "";
+String f_pos 		= "";// 	= request.getParameter("RangePos");
 String complete		= "false";//文件块是否已发送完毕（最后一个文件块数据）
+String fd_idSvr		= "";
+String fd_lenSvr	= "";
+String fd_perSvr	= "0%";
 String pathSvr		= "";//add(2015-03-19):服务器文件路径由客户端提供，此页面减少一次访问数据库的操作。
  
 // Check that we have a file upload request
@@ -65,11 +77,16 @@ while (fileItr.hasNext())
 	{
 		String fn = rangeFile.getFieldName();
 		String fv = rangeFile.getString(); 
-		if(fn.equals("uid")) struid = fv;
-		if(fn.equals("fid")) strfid = fv;
+		if(fn.equals("uid")) uid = fv;
+		if(fn.equals("idSvr")) idSvr = fv;
 		if(fn.equals("md5")) md5 = fv;
-		if(fn.equals("FileSize")) strFileSize = fv;
-		if(fn.equals("RangePos")) strRangePos = fv;
+		if(fn.equals("lenSvr")) lenSvr = fv;
+		if(fn.equals("lenLoc")) lenLoc = fv;
+		if(fn.equals("perSvr")) perSvr = fv;
+		if(fn.equals("fd-idSvr")) fd_idSvr = fv;
+		if(fn.equals("fd-lenSvr")) fd_lenSvr = fv;
+		if(fn.equals("fd-perSvr")) fd_perSvr = fv;
+		if(fn.equals("RangePos")) f_pos = fv;
 		if(fn.equals("complete")) complete = fv;
 		if(fn.equals("pathSvr")) pathSvr = fv;//add(2015-03-19):
 	}
@@ -80,62 +97,57 @@ while (fileItr.hasNext())
 }
 
 //参数为空
-if ( StringUtils.isBlank( strFileSize )
-	|| StringUtils.isBlank( struid )
-	|| StringUtils.isBlank( strfid )
-	|| StringUtils.isBlank( md5 )
-	|| StringUtils.isBlank( strRangePos ) 
-	|| StringUtils.isBlank(pathSvr))
+if ( 	StringUtils.isBlank( lenSvr )
+	|| 	StringUtils.isBlank( uid )
+	|| 	StringUtils.isBlank( idSvr )
+	|| 	StringUtils.isBlank( md5 )
+	|| 	StringUtils.isBlank( f_pos) 
+	|| 	StringUtils.isBlank(pathSvr))
 {
-	XDebug.Output("fileSize", strFileSize);
-	XDebug.Output("uid", struid);
-	XDebug.Output("fid", strfid);
+	XDebug.Output("uid", uid);
+	XDebug.Output("idSvr", idSvr);
 	XDebug.Output("md5", md5);
+	XDebug.Output("f_pos", f_pos);
 	XDebug.Output("param is null");
 	return;
 }
 
-if (	!strFileSize.isEmpty()
-	&&	!struid.isEmpty()
-	&& 	!strfid.isEmpty()
-	&&	!md5.isEmpty()
-	&& 	!strRangePos.isEmpty()
-	&&	!pathSvr.isEmpty())
-{
-	pathSvr				= pathSvr.replaceAll("\\+","%20");	
-	pathSvr 			= URLDecoder.decode(pathSvr,"UTF-8");//utf-8解码//客户端使用的是encodeURIComponent编码，
-	long fileSize 		= Long.parseLong(strFileSize);
-	long rangePos 		= Long.parseLong(strRangePos);
-	int uid 			= Integer.parseInt(struid);
-	int fid 			= Integer.parseInt(strfid);
-	long rangeSize 		= rangeFile.getSize();//控件上传的文件块大小	
-	long postedLength 	= rangePos + rangeSize;//已上传大小 = 文件块索引 + 临时文件块大小
-	//上传百分比 = 已上传大小 / 文件总大小
-	double per 			= ((double)postedLength / (double)fileSize) * 100;
-	double perd 		= Math.round(per);
-	String postedPercent = Double.toString(perd) + "%";
+	pathSvr	= pathSvr.replace("+","%20");	
+	pathSvr = URLDecoder.decode(pathSvr,"UTF-8");//utf-8解码//客户端使用的是encodeURIComponent编码，
 
-	XDebug.Output("per", per);
-	XDebug.Output("fileSize", fileSize);
-	XDebug.Output("postedPercent", postedPercent);
-	XDebug.Output("uid", struid);
-	XDebug.Output("fid", strfid);
-	XDebug.Output("rangePos", rangePos);
-	XDebug.Output("postedLength", postedLength);
-	XDebug.Output("postedPercent", postedPercent);
+	XDebug.Output("perSvr", perSvr);
+	XDebug.Output("lenSvr", lenSvr);
+	XDebug.Output("lenLoc", lenLoc);
+	XDebug.Output("uid", uid);
+	XDebug.Output("idSvr", idSvr);
+	XDebug.Output("f_pos", f_pos);
 	XDebug.Output("complete", complete);
 	XDebug.Output("pathSvr",pathSvr);
+	XDebug.Output("fd_idSvr",fd_idSvr);
+	XDebug.Output("fd_lenSvr",fd_lenSvr);
+	XDebug.Output("fd_perSvr",fd_perSvr);
 	
 	//保存文件块数据
 	FileResumerPart res = new FileResumerPart();
-	res.m_RangePos = rangePos;
-	res.m_FileSize = fileSize;
+	res.m_RangePos = Long.parseLong(f_pos);
 	res.SaveFileRange(rangeFile, pathSvr);
 	
 	//更新文件进度信息
 	DBFile db = new DBFile();
-	db.UpdateProgress(uid,fid,rangePos,postedLength,postedPercent);
+	boolean fd = !StringUtils.isBlank(fd_idSvr);
+	if(fd) fd = !StringUtils.isBlank(fd_lenSvr);
+	if(fd) fd = Integer.parseInt(fd_idSvr)>0;
+	if(fd) fd = Long.parseLong(fd_lenSvr)>0;
+	if(fd)
+	{		
+		boolean cmp = StringUtils.equals(complete,"true");
+		db.fd_fileProcess(Integer.parseInt(uid),Integer.parseInt(idSvr),Long.parseLong(f_pos),Long.parseLong(lenSvr),perSvr,Integer.parseInt(fd_idSvr),Long.parseLong(fd_lenSvr),fd_perSvr,cmp);
+	}
+	else
+	{
+		db.f_process(Integer.parseInt(uid),Integer.parseInt(idSvr),Long.parseLong(f_pos),Long.parseLong(lenSvr),perSvr);		
+	}
 			
 	out.write("ok");
-}
+
 %>

@@ -1,8 +1,6 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
+<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="Xproer.*" %><%@ 
-	page import="org.apache.commons.lang.*" %><%@ 
-	page import="java.io.*" %><%
+	page import="org.apache.commons.lang.StringUtils" %><%
 /*
 	此页面主要用来向数据库添加一条记录。
 	一般在 HttpUploader.js HttpUploader_MD5_Complete(obj) 中调用

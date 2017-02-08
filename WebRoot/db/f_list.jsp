@@ -1,36 +1,32 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
+<%@ page language="java" import="up6.DBFile" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="Xproer.*" %><%@ 
-	page import="org.apache.commons.lang.*" %><%@ 
-	page import="java.net.URLDecoder" %><%@
-	page import="java.net.URLEncoder" %><%@
-	 page import="java.io.*" %><%
+	page import="up6.XDebug" %><%@
+	page import="up6.biz.*" %><%@
+	page import="org.apache.commons.lang.StringUtils" %><%@
+	page import="java.net.URLEncoder" %><%
 /*
-	此页面主要用来向数据库添加一条记录。
-	一般在 HttpUploader.js HttpUploader_MD5_Complete(obj) 中调用
+	获取所有未上传完的文件和文件夹
 	更新记录：
 		2012-05-24 完善
 		2012-06-29 增加创建文件逻辑，
+		2016-01-08 规范JSON返回值格式
+		2016-04-09 更新加载未完成列表的逻辑
 
 	JSON格式化工具：http://tool.oschina.net/codeformat/json
 */
-String path = request.getContextPath();
-String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
-
 String uid = request.getParameter("uid");
 String cbk = request.getParameter("callback");//jsonp
 
-
-if(! StringUtils.isBlank(uid) )
+if( uid.length() >0 )
 {
-	String json = DBFile.GetAllUnComplete(Integer.parseInt(uid) );
-	if(! StringUtils.isBlank(json))
+	un_builder ub = new un_builder();
+	String json = ub.read(uid);	
+	if(!StringUtils.isBlank(json))
 	{
-		XDebug.Output(json);
 		json = URLEncoder.encode(json,"utf-8");
-		XDebug.Output(json);
 		json = json.replace("+","%20");
-		out.write(cbk + "({\"value\":\"" + json + "\"})");
+		XDebug.Output("编码后的JSON",json);
+		out.write( cbk + "({\"value\":\""+json + "\"})" );
 		return;
 	}
 }

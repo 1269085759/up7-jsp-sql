@@ -1,6 +1,6 @@
-USE [HttpUploader6]
+USE [up7]
 GO
-/****** 对象:  StoredProcedure [dbo].[spGetFileInfByFid]    脚本日期: 07/31/2014 16:53:29 ******/
+/****** 对象:  StoredProcedure [dbo].[spGetFileInfByFid]    脚本日期: 10/30/2012 15:19:54 ******/
 SET ANSI_NULLS ON
 GO
 SET QUOTED_IDENTIFIER ON
@@ -13,7 +13,7 @@ GO
 -- =============================================
 CREATE PROCEDURE [dbo].[spGetFileInfByFid]
 	-- Add the parameters for the stored procedure here
-	@fid int	--文件ID。
+	@f_id int	--文件ID。
 AS
 BEGIN
 	-- SET NOCOUNT ON added to prevent extra result sets from
@@ -23,10 +23,10 @@ BEGIN
 	DECLARE @sql nvarchar(1000);
 	DECLARE @ParamDef nvarchar(500);
 
-	SET @sql = N'select top 1 * from xdb_files where fid=@fid';
-	SET @ParamDef = N'@fid int';
+	SET @sql = N'select top 1 * from up7_files where f_id=@f_id';
+	SET @ParamDef = N'@f_id int';
     -- Insert statements for procedure here
-	EXECUTE sp_executesql @sql, @ParamDef,@fid
+	EXECUTE sp_executesql @sql, @ParamDef,@f_id
 
 END
 

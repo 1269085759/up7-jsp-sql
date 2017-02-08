@@ -1,6 +1,7 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
 	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="Xproer.*" %><%@ 
+	page import="up6.*" %><%@
+	page import="up6.model.*" %><%@ 
 	page import="java.net.URLDecoder" %><%@ 
 	page import="net.sf.json.JSONArray" %><%@ 
 	page import="net.sf.json.JSONObject" %><%@ 
@@ -8,8 +9,7 @@
 	page import="com.google.gson.Gson" %><%@ 
 	page import="com.google.gson.GsonBuilder" %><%@ 
 	page import="com.google.gson.annotations.SerializedName" %><%@ 
-	page import="java.io.*" %><%
-/*
+	page import="java.io.*" %><%/*
 	此页面主要用来向数据库添加一条记录。
 	一般在 HttpUploader.js HttpUploader_MD5_Complete(obj) 中调用
 	更新记录：
@@ -22,5 +22,4 @@ ArrayList<xdb_files> arrFiles = new ArrayList<xdb_files>();
 
 Gson g = new Gson();
 
-out.write(FolderInf.class.toString());
-%>
+out.write(FolderInf.class.toString());%>

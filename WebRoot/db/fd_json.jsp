@@ -1,10 +1,7 @@
-<%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
+<%@ page language="java" import="up6.DBFolder" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="Xproer.*" %><%@ 
-	page import="org.apache.commons.lang.*" %><%@ 
-	page import="java.net.URLDecoder" %><%@ 
-	page import="java.io.*" %><%
-/*
+	page import="up6.model.FolderInf" %><%@
+	page import="org.apache.commons.lang.StringUtils" %><%/*
 	以JSON格式返回文件夹信息。
 	更新记录：
 		2014-07-21 创建
@@ -25,6 +22,4 @@ else
 	FolderInf folder = new FolderInf();
 	String json = DBFolder.GetFilesUnComplete(Integer.parseInt(fid),folder);
 	out.write(callback + "(" + json + ")");
-}
-
-%>
+}%>
