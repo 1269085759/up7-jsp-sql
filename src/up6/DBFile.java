@@ -43,8 +43,8 @@ public class DBFile {
         sql.append(",f_lenSvr");
         sql.append(",f_pathSvr");//fix:服务器会重复创建文件项的问题
         sql.append(",fd_pathRel");//
-        sql.append(" from up6_files");
-        sql.append(" left join up6_folders");
+        sql.append(" from up7_files");
+        sql.append(" left join up7_folders");
         sql.append(" on fd_id = f_pid");
         sql.append(" where f_pidRoot=? and f_complete=1");
 
@@ -97,8 +97,8 @@ public class DBFile {
         sb.append(",f_sizeLoc");
         sb.append(",f_perSvr");
         //sb.append(",fd_size");
-        sb.append(" from up6_files");
-        //sb.append(" left join up6_folders");
+        sb.append(" from up7_files");
+        //sb.append(" left join up7_folders");
         //sb.append(" on f_fdID = fd_id");
         sb.append(" where f_deleted=0 and f_fdChild=0 and f_complete=1");
 
@@ -151,7 +151,7 @@ public class DBFile {
 		//文件夹信息
 		sb.append(",fd_files");
 		sb.append(",fd_filesComplete");
-		sb.append(" from up6_files left join up6_folders on up6_files.f_fdID = up6_folders.fd_id");//change(2015-03-18):联合查询文件夹数据
+		sb.append(" from up7_files left join up7_folders on up7_files.f_fdID = up7_folders.fd_id");//change(2015-03-18):联合查询文件夹数据
 		sb.append(" where f_uid=? and f_deleted=0 and f_fdChild=0 and f_complete=0;");//fix(2015-03-18):只加载未完成列表
 
 		ArrayList<xdb_files> files = new ArrayList<xdb_files>();
@@ -252,7 +252,7 @@ public class DBFile {
 		sb.append(",f_complete");
 		sb.append(",f_time");
 		sb.append(",f_deleted");
-		sb.append(" from up6_files where f_md5=? order by f_perSvr DESC");
+		sb.append(" from up7_files where f_md5=? order by f_perSvr DESC");
 
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sb.toString());
@@ -298,7 +298,7 @@ public class DBFile {
 	public int Add(xdb_files model)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("insert into up6_files(");
+		sb.append("insert into up7_files(");
 		sb.append("f_sizeLoc");
 		sb.append(",f_pos");
 		sb.append(",f_lenSvr");
@@ -361,7 +361,7 @@ public class DBFile {
 
 		db.ExecuteNonQuery(cmd,false);
 
-		String sql = "select top 1 f_id from up6_files order by f_id desc";		
+		String sql = "select top 1 f_id from up7_files order by f_id desc";		
 		int f_id = db.ExecuteScalar(sql);
 		return f_id;
 	}
@@ -374,7 +374,7 @@ public class DBFile {
 	static public int Add(FolderInf inf)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("insert into up6_files(");
+		sb.append("insert into up7_files(");
 		sb.append("f_nameLoc");
 		sb.append(",f_fdTask");
 		sb.append(",f_fdID");
@@ -417,7 +417,7 @@ public class DBFile {
 	static public int Add(FileInf inf)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("insert into up6_files(");
+		sb.append("insert into up7_files(");
 		sb.append(" f_pid");//1
 		sb.append(",f_pidRoot");//2
 		sb.append(",f_fdChild");//3
@@ -471,7 +471,7 @@ public class DBFile {
 			e.printStackTrace();
 		}		
 		db.ExecuteNonQuery(cmd);
-		int f_id = db.ExecuteScalar("select top 1 f_id from up6_files order by f_id desc");
+		int f_id = db.ExecuteScalar("select top 1 f_id from up7_files order by f_id desc");
 		
 		return f_id;
 	}
@@ -486,7 +486,7 @@ public class DBFile {
 	public void UpdateChild(FileInf inf)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("update up6_files set ");
+		sb.append("update up7_files set ");
 		sb.append(" f_pathSvr = ?, ");
 		sb.append(" f_md5 = ? ");
 		sb.append(" where f_id=? ");
@@ -511,7 +511,7 @@ public class DBFile {
     public void UpdateMD5(xdb_files inf)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("update up6_files set ");
+		sb.append("update up7_files set ");
 		sb.append(" f_md5 = ? ");
 		sb.append(" where f_id=? ");
 
@@ -532,7 +532,7 @@ public class DBFile {
     public void UpdateMD5_path(xdb_files inf)
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("update up6_files set ");
+		sb.append("update up7_files set ");
 		sb.append(" f_md5 = ? ");
 		sb.append(",f_pathSvr = ? ");
 		sb.append(" where f_id=? ");
@@ -557,7 +557,7 @@ public class DBFile {
     public void updateInf(xdb_files inf)
     {
 		StringBuilder sb = new StringBuilder();
-		sb.append("update up6_files set ");
+		sb.append("update up7_files set ");
 		sb.append(" f_md5 = ? ");
 		sb.append(",f_pathSvr = ? ");//
 		sb.append(",f_lenSvr = ? ");//
@@ -588,8 +588,8 @@ public class DBFile {
 	static public void Clear()
 	{
 		DbHelper db = new DbHelper();
-		db.ExecuteNonQuery("delete from up6_files;");
-		db.ExecuteNonQuery("delete from up6_folders;");
+		db.ExecuteNonQuery("delete from up7_files;");
+		db.ExecuteNonQuery("delete from up7_folders;");
 	}
 
 	/**
@@ -599,7 +599,7 @@ public class DBFile {
 	static public void Complete(int f_uid, int f_id)
 	{
 		DbHelper db = new DbHelper();
-		PreparedStatement cmd = db.GetCommand("update up6_files set f_perSvr='100%' ,f_complete=1 where f_uid=? and f_fdID=?;");
+		PreparedStatement cmd = db.GetCommand("update up7_files set f_perSvr='100%' ,f_complete=1 where f_uid=? and f_fdID=?;");
 		try {
 			cmd.setInt(1, f_uid);
 			cmd.setInt(2, f_id);
@@ -616,8 +616,8 @@ public class DBFile {
 	 */
 	static public void fd_complete(String f_id, String fd_id, String uid)
 	{
-		String sql = "update up6_files set f_perSvr='100%' ,f_complete=1 where f_id=?;";
-		sql += "update up6_folders set fd_complete=1 where fd_id=? and fd_uid=?;";
+		String sql = "update up7_files set f_perSvr='100%' ,f_complete=1 where f_id=?;";
+		sql += "update up7_folders set fd_complete=1 where fd_id=? and fd_uid=?;";
 		
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
@@ -676,7 +676,7 @@ public class DBFile {
 	///<param name="f_perSvr">已上传百分比</param>
 	public boolean f_process(int f_uid,int f_id,long f_pos,long f_lenSvr,String f_perSvr)
 	{
-		//String sql = "update up6_files set f_pos=?,f_lenSvr=?,f_perSvr=? where f_uid=? and f_id=?";
+		//String sql = "update up7_files set f_pos=?,f_lenSvr=?,f_perSvr=? where f_uid=? and f_id=?";
 		String sql = "{call f_process(?,?,?,?,?,?)}";
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommandStored(sql);
@@ -700,7 +700,7 @@ public class DBFile {
 	/// </summary>
 	public void UploadComplete(String md5)
 	{
-		String sql = "update up6_files set f_lenSvr=f_lenLoc,f_perSvr='100%',f_complete=1 where f_md5=?";
+		String sql = "update up7_files set f_lenSvr=f_lenLoc,f_perSvr='100%',f_complete=1 where f_md5=?";
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
 		
@@ -723,7 +723,7 @@ public class DBFile {
 		if (md5 == null) return false;
 		if(md5.isEmpty()) return false;
 
-		String sql = "select f_id from up6_files where f_complete=1 and f_md5=?";
+		String sql = "select f_id from up7_files where f_complete=1 and f_md5=?";
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
 
@@ -745,7 +745,7 @@ public class DBFile {
 	/// <param name="f_id"></param>
 	public void Delete(int f_uid,int f_id)
 	{
-		String sql = "update up6_files set f_deleted=1 where f_uid=? and f_id=?";
+		String sql = "update up7_files set f_deleted=1 where f_uid=? and f_id=?";
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
 
@@ -776,7 +776,7 @@ public class DBFile {
 		sql.append(",f_md5");
 		sql.append(",f_pidRoot");
 		sql.append(",f_pid");
-		sql.append(" from up6_files where f_pidRoot=?;");
+		sql.append(" from up7_files where f_pidRoot=?;");
 		ArrayList<FileInf> arrFiles = new ArrayList<FileInf>();
 
 		DbHelper db = new DbHelper();
@@ -827,7 +827,7 @@ public class DBFile {
         sql.append(",f_pid");
         sql.append(",f_lenSvr");
         sql.append(",f_pathSvr");//fix(2015-03-18):续传文件时服务器会创建重复文件项信息
-		sql.append(" from up6_files where f_pidRoot=? and f_complete=0;");
+		sql.append(" from up7_files where f_pidRoot=? and f_complete=0;");
 
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql.toString());
@@ -884,7 +884,7 @@ public class DBFile {
 		sb.append(",f_complete");
 		sb.append(",f_time");
 		sb.append(",f_deleted");
-		sb.append(" from up6_files where f_id=? ");
+		sb.append(" from up7_files where f_id=? ");
 		
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sb.toString());
