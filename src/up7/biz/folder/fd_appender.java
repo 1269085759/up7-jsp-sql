@@ -209,7 +209,7 @@ public class fd_appender
     void pre_udpate_fd() throws SQLException
     {
         StringBuilder sb = new StringBuilder();        
-        sb.append("update up6_folders set");
+        sb.append("update up7_folders set");
         sb.append(" fd_name=?");
         sb.append(",fd_pid=?");
         sb.append(",fd_uid=?");
