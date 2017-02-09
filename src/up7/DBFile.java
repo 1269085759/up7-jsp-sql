@@ -698,14 +698,15 @@ public class DBFile {
 	/// <summary>
 	/// 上传完成。将所有相同MD5文件进度都设为100%
 	/// </summary>
-	public void UploadComplete(String md5)
+	public void complete(int uid,int idSvr)
 	{
-		String sql = "update up7_files set f_lenSvr=f_lenLoc,f_perSvr='100%',f_complete=1 where f_md5=?";
+		String sql = "update up7_files set f_lenSvr=f_lenLoc,f_perSvr='100%',f_complete=1 where f_id=? and f_uid=?";
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
 		
 		try {
-			cmd.setString(1, md5);
+			cmd.setInt(1, uid);
+			cmd.setInt(2, idSvr);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

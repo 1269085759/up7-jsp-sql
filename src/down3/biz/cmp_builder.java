@@ -44,8 +44,6 @@ public class cmp_builder {
         //
         sb.append(" where up7_files.f_uid=? and up7_files.f_deleted=0 and up7_files.f_complete=1");
 
-        XDebug.Output(sb.toString());
-
         DbHelper db = new DbHelper();
         PreparedStatement cmd = db.GetCommand(sb.toString());
         cmd.setInt(1, uid);
