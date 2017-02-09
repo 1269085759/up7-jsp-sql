@@ -708,8 +708,8 @@ public class DBFile {
 		PreparedStatement cmd = db.GetCommand(sql);
 		
 		try {
-			cmd.setInt(1, uid);
-			cmd.setInt(2, idSvr);
+			cmd.setInt(1, idSvr);
+			cmd.setInt(2, uid);
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
