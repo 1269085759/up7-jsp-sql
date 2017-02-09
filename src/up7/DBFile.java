@@ -621,6 +621,7 @@ public class DBFile {
 	{
 		String sql = "update up7_files set f_perSvr='100%' ,f_complete=1 where f_id=?;";
 		sql += "update up7_folders set fd_complete=1 where fd_id=? and fd_uid=?;";
+		sql += "update up7_files set f_perSvr='100%',f_lenSvr=f_lenLoc,f_complete=1 where f_pidRoot=?;";
 		
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
@@ -628,6 +629,7 @@ public class DBFile {
 			cmd.setInt(1, Integer.parseInt(f_id));
 			cmd.setInt(2, Integer.parseInt(fd_id));
 			cmd.setInt(3, Integer.parseInt(uid));
+			cmd.setInt(4, Integer.parseInt(fd_id));
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
