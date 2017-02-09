@@ -335,6 +335,7 @@ public class fd_appender
         sb.append(",f_lenSvr=?");
         sb.append(",f_perSvr=?");
         sb.append(",f_complete=?");
+        sb.append(",f_sign=?");
         sb.append(" where f_id=?");
 
         this.cmd_update_file = this.con.prepareStatement(sb.toString());
@@ -356,7 +357,8 @@ public class fd_appender
         this.cmd_update_file.setLong(16, 0);//f_lenSvr
         this.cmd_update_file.setString(17, "");//f_perSvr
         this.cmd_update_file.setBoolean(18, false);//f_complete
-        this.cmd_update_file.setInt(19, 0);//f_id
+        this.cmd_update_file.setString(19, "");//f_sign
+        this.cmd_update_file.setInt(20, 0);//f_id
     }
 
     void update_file(fd_file f) throws SQLException
@@ -379,7 +381,8 @@ public class fd_appender
         this.cmd_update_file.setLong(16, f.lenSvr);//f_lenSvr
         this.cmd_update_file.setString(17, f.lenLoc > 0 ? f.perSvr : "100%");//f_perSvr
         this.cmd_update_file.setBoolean(18, f.lenLoc > 0 ? f.complete : true);//f_complete
-        this.cmd_update_file.setInt(19, f.idSvr);//f_id
+        this.cmd_update_file.setString(19, f.sign);//f_sign
+        this.cmd_update_file.setInt(20, f.idSvr);//f_id
         this.cmd_update_file.execute();
     }
 }

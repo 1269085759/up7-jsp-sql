@@ -1,5 +1,7 @@
 package up7.biz.folder;
 
+import java.util.UUID;
+
 public class fd_file 
 {
     public int idLoc = 0;
@@ -10,6 +12,7 @@ public class fd_file
     public String pathSvr = "";
     public String pathRel = "";
     public String md5 = "";
+    public String sign = UUID.randomUUID().toString().replace("-", "");
     public int pidLoc = 0;
     public int pidSvr = 0;
     public int pidRoot = 0;//
