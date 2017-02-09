@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import up7.DbHelper;
+import up7.XDebug;
 
 import com.google.gson.Gson;
 
@@ -42,6 +43,8 @@ public class cmp_builder {
         sb.append(" from up7_files ");
         //
         sb.append(" where up7_files.f_uid=? and up7_files.f_deleted=0 and up7_files.f_complete=1");
+
+        XDebug.Output(sb.toString());
 
         DbHelper db = new DbHelper();
         PreparedStatement cmd = db.GetCommand(sb.toString());

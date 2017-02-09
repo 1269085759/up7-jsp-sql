@@ -77,7 +77,6 @@ while (fileItr.hasNext())
 		String fv = rangeFile.getString(); 
 		if(fn.equals("uid")) uid = fv;
 		if(fn.equals("idSvr")) idSvr = fv;
-		if(fn.equals("md5")) md5 = fv;
 		if(fn.equals("lenSvr")) lenSvr = fv;
 		if(fn.equals("lenLoc")) lenLoc = fv;
 		if(fn.equals("perSvr")) perSvr = fv;

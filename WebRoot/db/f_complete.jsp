@@ -31,4 +31,5 @@ if(!StringUtils.isBlank(fd_id))
 {
 	DBFolder.child_complete(Integer.parseInt(fd_id));
 }
+XDebug.Output("文件上传完毕");
 %><%=callback + "(" + ret + ")"%>

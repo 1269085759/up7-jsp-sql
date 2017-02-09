@@ -40,7 +40,7 @@ function DownloaderMgr()
 	var _this = this;
 	this.Config = {
 		  "Folder"		: "F:\\ftp\\"
-		, "Debug"		: true//调试模式
+		, "Debug"		: false//调试模式
 		, "LogFile"		: "f:\\log.txt"//日志文件路径。
 		, "Company"		: "荆门泽优软件有限公司"
 		, "Version"		: "1,2,56,31650"
@@ -50,14 +50,14 @@ function DownloaderMgr()
 		, "FilePart"	: 5242880//文件块大小，更新进度时使用，计算器：http://www.beesky.com/newsite/bit_byte.htm
 		, "FilePartTdr"	: 3//文件块线程数
         //file
-        , "UrlCreate"   : "http://localhost:88/demoSql2005/down3/db/f_create.aspx"
-        , "UrlDel"      : "http://localhost:88/demoSql2005/down3/db/f_del.aspx"
-        , "UrlList"     : "http://localhost:88/demoSql2005/down3/db/f_list.aspx"
-        , "UrlListCmp"  : "http://localhost:88/demoSql2005/down3/db/f_list_cmp.aspx"
-        , "UrlUpdate"   : "http://localhost:88/demoSql2005/down3/db/f_update.aspx"
-        , "UrlDown"     : "http://localhost:88/demoSql2005/down3/db/f_down.aspx"
+        , "UrlCreate"   : "http://localhost:8080/Uploader7SQL/down3/db/f_create.jsp"
+        , "UrlDel"      : "http://localhost:8080/Uploader7SQL/down3/db/f_del.jsp"
+        , "UrlList"     : "http://localhost:8080/Uploader7SQL/down3/db/f_list.jsp"
+        , "UrlListCmp"  : "http://localhost:8080/Uploader7SQL/down3/db/f_list_cmp.jsp"
+        , "UrlUpdate"   : "http://localhost:8080/Uploader7SQL/down3/db/f_update.jsp"
+        , "UrlDown"     : "http://localhost:8080/Uploader7SQL/down3/db/f_down.jsp"
 	    //folder
-        , "UrlFdCreate" : "http://localhost:88/demoSql2005/down3/db/fd_create.aspx"
+        , "UrlFdCreate" : "http://localhost:8080/Uploader7SQL/down3/db/fd_create.jsp"
         //x86
 		, "ClsidPart"	: "57FA11EE-5E98-415C-933D-BCA188B86B5E"
 		, "CabPath"		: "http://www.ncmem.com/download/down3/down3.cab"
