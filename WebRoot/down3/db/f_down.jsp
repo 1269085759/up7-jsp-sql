@@ -56,7 +56,7 @@ try
 	os = response.getOutputStream();
 	String range = request.getHeader("Range");
 	long rangePos = 0;
-	if(StringUtils.isBlank(range))
+	if( !StringUtils.isBlank(range) )
 	{
 		/*
 	        表示头500个字节：bytes=0-499
