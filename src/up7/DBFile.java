@@ -619,9 +619,9 @@ public class DBFile {
 	 */
 	static public void fd_complete(String f_id, String fd_id, String uid)
 	{
-		String sql = "update up7_files set f_perSvr='100%' ,f_complete=1 where f_id=?;";
+		String sql = "update up7_files set f_perSvr='100%' ,f_complete=1 ,f_lenSvr=f_lenLoc where f_id=?;";//更新文件夹状态，设为已完成
 		sql += "update up7_folders set fd_complete=1 where fd_id=? and fd_uid=?;";
-		sql += "update up7_files set f_perSvr='100%',f_lenSvr=f_lenLoc,f_complete=1 where f_pidRoot=?;";
+		sql += "update up7_files set f_perSvr='100%',f_lenSvr=f_lenLoc,f_complete=1 where f_pidRoot=?;";//更新所有子文件状态，设为已完成
 		
 		DbHelper db = new DbHelper();
 		PreparedStatement cmd = db.GetCommand(sql);
