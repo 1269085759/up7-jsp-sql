@@ -167,6 +167,19 @@ function FolderUploader(idLoc, fdLoc, mgr)
 
         setTimeout(function () { _this.manager.PostNext(); }, 500);
     };
+    this.post_stoped = function (json)
+    {
+        this.ui.msg.text("传输已停止....");
+        this.ui.btn.stop.hide();
+        this.ui.btn.post.show();
+        this.ui.btn.del.show();
+
+        this.State = HttpUploaderState.Stop;
+        //从上传列表中删除
+        this.manager.RemoveQueuePost(this.idLoc);
+        //添加到未上传列表
+        this.manager.AppendQueueWait(this.idLoc);
+    };
     this.post_process = function (json)
     {
         if (this.State == HttpUploaderState.Stop) return;
@@ -283,7 +296,7 @@ function FolderUploader(idLoc, fdLoc, mgr)
         this.manager.RemoveQueuePost(this.idLoc);
         //从未上传列表中删除
         this.manager.RemoveQueueWait(this.idLoc);
-        this.ui.msg.text("共" + this.folderSvr.filesCount + "个文件，成功上传" + this.arrFilesComplete.length + "个文件");
+        this.ui.msg.text("共" + this.folderSvr.filesCount + "个文件，成功上传" + this.folderSvr.filesCount + "个文件");
 
         $.ajax({
             type: "GET"
@@ -311,6 +324,10 @@ function FolderUploader(idLoc, fdLoc, mgr)
     //手动点击“停止”按钮时
     this.stop = function ()
     {
+        this.svr_update();//
+        this.ui.btn.post.hide();
+        this.ui.btn.stop.hide();
+        this.ui.btn.cancel.hide();
         this.State = HttpUploaderState.Stop;
         if (HttpUploaderState.Ready == this.State)
         {
@@ -326,12 +343,6 @@ function FolderUploader(idLoc, fdLoc, mgr)
         this.browser.stopFile({ id: this.idLoc });
         this.manager.RemoveQueuePost(this.idLoc);
         this.manager.AppendQueueWait(this.idLoc);
-        this.ui.btn.post.show();
-        this.ui.btn.del.show();
-        this.ui.btn.cancel.hide();
-        this.ui.btn.stop.hide();
-
-        this.svr_update();//
     };
 
     //从上传列表中删除上传任务

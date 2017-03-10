@@ -69,7 +69,7 @@ function HttpUploaderMgr()
 	this.Config = {
 		  "EncodeType"		: "utf-8"
 		, "Company"			: "荆门泽优软件有限公司"
-		, "Version"			: "2,7,103,31652"
+		, "Version"			: "2,7,106,50757"
 		, "License"			: ""//
 		, "Authenticate"	: ""//域验证方式：basic,ntlm
 		, "AuthName"		: ""//域帐号
@@ -1083,10 +1083,6 @@ function HttpUploaderMgr()
 		btnStop.click(function ()
 		{
 		    upFile.stop();
-		    btnPost.show();
-		    btnDel.show();
-		    btnCancel.hide();
-		    btnStop.hide();
 		});
 		btnDel.click(function () { upFile.remove(); });
 		
@@ -1162,10 +1158,6 @@ function HttpUploaderMgr()
 	    btnStop.click(function ()
 	    {
 	        fdTask.stop();
-	        btnPost.show();
-	        btnDel.show();
-	        btnCancel.hide();
-	        btnStop.hide();
 	    });
 		btnDel.click(function(){fdTask.remove();});
 		fdTask.Ready(); //准备
