@@ -90,6 +90,22 @@ public class DBFolder {
 		int fid = db.ExecuteScalar(sql);
 		return fid;
 	}
+	
+	static public void update(int fid,String perSvr,long lenSvr,int uid)
+	{
+		String sql = "update up7_files set f_perSvr=?,f_lenSvr=? where f_id=?;";
+		DbHelper db = new DbHelper();
+		PreparedStatement cmd = db.GetCommand(sql);
+		try
+		{
+			cmd.setString(1, perSvr);
+			cmd.setLong(2, lenSvr);
+			cmd.setInt(3, fid);
+		} catch(SQLException e){
+			e.printStackTrace();
+		}
+		db.ExecuteNonQuery(cmd);
+	}
 
 	/**
 	 * 将文件夹上传状态设为已完成
