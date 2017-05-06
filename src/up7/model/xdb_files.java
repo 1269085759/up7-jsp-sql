@@ -23,14 +23,17 @@ public class xdb_files {
 
 	//数据表唯一ID
 	public int idSvr=0;
+	//全局GUID
+	public String idSign="";
+	public String getIdSign(){return idSign;}
+	public void setIdSign(String v){this.idSign = v;}
+	
 	//文件夹ID
 	public int pid=0;
-    public int getIdSvr() {
-		return idSvr;
-	}
-	public void setIdSvr(int idSvr) {
-		this.idSvr = idSvr;
-	}
+    public int getIdSvr() { return idSvr; }
+	public void setIdSvr(int idSvr) { this.idSvr = idSvr; }
+	//文件块
+	public int blockCount=1;
 
 	public int getPid() {
 		return pid;
@@ -145,6 +148,7 @@ public class xdb_files {
 	public int 		getFilesComplete() {return filesComplete;}
 	public void 	setFilesComplete(int filesComplete) {this.filesComplete = filesComplete;	}
 
+	public String rootSign="";
 	//根级文件夹ID
     public int pidRoot=0;	
 	/**	 * 表示当前项是否是一个文件夹项。	 */

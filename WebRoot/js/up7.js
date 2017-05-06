@@ -81,7 +81,7 @@ function HttpUploaderMgr()
 		, "FileSizeLimit"	: "0"//自定义允许上传的文件大小，以字节为单位。0表示不限制。字节计算工具：http://www.beesky.com/newsite/bit_byte.htm
 		, "FilesLimit"		: "0"//文件选择数限制。0表示不限制
 		, "AllowMultiSelect": true//多选开关。1:开启多选。0:关闭多选
-		, "RangeSize"		: "5242880"//文件块大小，以字节为单位。必须为64KB的倍数。推荐大小：5MB。
+		, "RangeSize"		: "67108864"//文件块大小，以字节为单位。必须为64KB的倍数。推荐大小：64MB。
 		, "Debug"			: false//是否打开调式模式。true,false
 		, "LogFile"			: "F:\\log.txt"//日志文件路径。需要先打开调试模式。
 		, "InitDir"			: ""//初始化路径。示例：D:\\Soft
@@ -89,7 +89,7 @@ function HttpUploaderMgr()
         , "Cookie"			: ""//服务器cookie
         , "QueueCount"      : 1//同时上传的任务数
 		//文件夹操作相关
-		, "UrlFdCreate"		: "http://localhost:8080/Uploader7SQL/db/fd_create_uuid.jsp"
+		, "UrlFdCreate"		: "http://localhost:8080/Uploader7SQL/db/fd_create.jsp"
 		, "UrlFdUpdate"		: "http://localhost:8080/Uploader7SQL/db/fd_update.jsp"
 		, "UrlFdComplete"	: "http://localhost:8080/Uploader7SQL/db/fd_complete.jsp"
 		, "UrlFdDel"	    : "http://localhost:8080/Uploader7SQL/db/fd_del.jsp"
@@ -167,7 +167,7 @@ function HttpUploaderMgr()
 		, filesUI: null //文件列表容器,JQuery
 		, filesUiMap: new Object()//ui映射表,JQuery
         , filesSvr: new Array()//服务器文件列表(json obj)
-        , filesSvrMap:new Object()//服务器文件映射表：(idSvr,json obj)
+        , filesSvrMap:new Object()//服务器文件映射表：(idSign,json obj)
 		, "GetHtml": function ()//加载控件
 		{
 			var html = '<div class="file-list-view" name="file-list-view">\
@@ -219,7 +219,7 @@ function HttpUploaderMgr()
 			            var files = JSON.parse(decodeURIComponent(msg.value));
 			            for (var i = 0, l = files.length; i < l; ++i)
 			            {
-			                ref.filesSvr.push(files[i].idSvr);
+			                ref.filesSvr.push(files[i].idSign);
 			                ref.addFileSvr(files[i]);
 			            }
 			        }
@@ -231,8 +231,8 @@ function HttpUploaderMgr()
         , "addFileSvr": function (fileSvr)
         {
             var ref = this;
-            var idSvr = fileSvr.idSvr;
-            this.filesSvrMap[idSvr] = fileSvr;
+            var idSign = fileSvr.idSign;
+            this.filesSvrMap[idSign] = fileSvr;
             var ui = this.FileItemTemp.clone();
             var liName = ui.find('li[name="fname"]');
             var liSize = ui.find('li[name="fsize"]');
@@ -246,7 +246,7 @@ function HttpUploaderMgr()
 
             if (fileSvr.complete)
             {
-                liOp.html('<span fid="' + idSvr + '">删除</span>').css("cursor", "pointer").click(function ()
+                liOp.html('<span fid="' + idSign + '">删除</span>').css("cursor", "pointer").click(function ()
                 {
                     ref.RemoveFile(fileSvr);
                 });
@@ -258,17 +258,17 @@ function HttpUploaderMgr()
                 liOp.find('span[name="btnDel"]').click(function () { ref.RemoveFile(fileSvr); });
             }
             //添加到文件列表项集合
-            this.filesUiMap[fileSvr.idSvr] = ui;
+            this.filesUiMap[fileSvr.idSign] = ui;
             this.filesUI.append(ui);
         }
 		, "UploadComplete": function (fileSvr)//上传完成，将操作改为删除。
 		{
-			//文件已存在
-		    if ( this.filesSvrMap[fileSvr.idSvr] != null)
+            //文件已存在
+            if (this.filesSvrMap[fileSvr.idSign] != null)
 		    {
-		        var ref = this;
-		        var idSvr = fileSvr.idSvr;
-		        var ui = this.filesUiMap[idSvr];
+                var ref = this;
+                var idSign = fileSvr.idSign;
+                var ui = this.filesUiMap[idSign];
 		        var liPer = ui.find('li[name="fper"]');
 		        var liOp = ui.find('li[name="fop"]');
 
@@ -281,7 +281,7 @@ function HttpUploaderMgr()
 		    else{ this.addFileSvr(fileSvr); }
 		}//文件夹上传完毕        
 		, "ResumerFile": function (fileSvr)//续传文件
-		{
+        {
 			//文件夹任务
 		    if (fileSvr.fdTask)
 			{
@@ -291,8 +291,8 @@ function HttpUploaderMgr()
 			{
 		        _this.ResumeFile(fileSvr);
 			}
-			_this.OpenPnlUpload(); //打开上传面板
-			this.RemoveFileCache(fileSvr.idSvr); //从内存中删除
+            _this.OpenPnlUpload(); //打开上传面板
+            this.RemoveFileCache(fileSvr.idSign); //从内存中删除
 			this.UploaderMgr.PostFirst();
 		}
 		, "RemoveFile": function (fileSvr)//删除文件
@@ -303,16 +303,16 @@ function HttpUploaderMgr()
 		        return;
 		    }
 		    var ref = this;
-		    var idSvr = fileSvr.idSvr;
-			var item = this.filesSvrMap[idSvr];
-			var ui = this.filesUiMap[idSvr];
+            var idSign = fileSvr.idSign;
+            var item = this.filesSvrMap[idSign];
+            var ui = this.filesUiMap[idSign];
 
 			$.ajax({
 				type: "GET"
 				, dataType: 'jsonp'
 				, jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
-				, url: this.Config["UrlDel"]
-				, data: { uid: fileSvr.uid, fid: fileSvr.idSvr, time: new Date().getTime() }
+                , url: this.Config["UrlDel"]
+                , data: { uid: fileSvr.uid, idSign: fileSvr.idSign, time: new Date().getTime() }
 				, success: function (msg) {if (msg == 1) {ui.empty();}}
 				, error: function () { alert("发送删除文件信息失败！"+req.responseText); }
 				, complete: function (req, sta) { req = null; }
@@ -321,25 +321,25 @@ function HttpUploaderMgr()
         , "RemoveFolder": function (fileSvr)
         {
             var ref = this;
-            var idSvr = fileSvr.idSvr;
-            var ui = this.filesUiMap[idSvr];
+            var idSign = fileSvr.idSign;
+            var ui = this.filesUiMap[idSign];
 
             $.ajax({
                 type: "GET"
 				, dataType: 'jsonp'
 				, jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
 				, url: this.Config["UrlFdDel"]
-				, data: { uid: fileSvr.uid, fid: fileSvr.idSvr,fd_id:fileSvr.fdID, time: new Date().getTime() }
+                , data: { uid: fileSvr.uid, idSign: fileSvr.idSign,time: new Date().getTime() }
 			    , success:function (msg){if (msg.value == 1){ui.empty();}}
 			    , error: function () { alert("发送删除文件信息失败！"); }
 			    , complete: function (req, sta) { req = null; }
             });
         }
-		, "RemoveFileCache": function (idSvr)
+		, "RemoveFileCache": function (idSign)
 		{
-		    this.filesSvrMap[idSvr] = null;
-		    this.filesUiMap[idSvr].empty();
-		    this.filesUiMap[idSvr] = null;
+            this.filesSvrMap[idSign] = null;
+            this.filesUiMap[idSign].empty();
+            this.filesUiMap[idSign] = null;
 		}
 	};
 

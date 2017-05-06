@@ -1,5 +1,7 @@
-<%@ page language="java" import="up7.DBFile" pageEncoding="UTF-8"%><%@
-	page contentType="text/html;charset=UTF-8"%><%@ 
+<%@ page language="java" import="up7.*" pageEncoding="UTF-8"%><%@
+	page contentType="text/html;charset=UTF-8"%><%@
+	page import="java.io.*" %><%@
+	page import="up7.biz.folder.*" %><%@ 
 	page import="up7.FileBlockWriter" %><%@
 	page import="up7.XDebug" %><%@
 	page import="org.apache.commons.fileupload.FileItem" %><%@
@@ -10,6 +12,7 @@
 	page import="org.apache.commons.lang.StringUtils" %><%@
 	page import="java.net.URLDecoder"%><%@ 
 	page import="java.util.Iterator"%><%@ 
+	page import="redis.clients.jedis.Jedis"%><%@
 	page import="java.util.List"%><%/*
 	此页面负责将文件块数据写入文件中。
 	此页面一般由控件负责调用
@@ -18,7 +21,6 @@
 		idSvr
 		md5
 		lenSvr
-		pathSvr
 		RangePos
 		fd_idSvr
 		fd_lenSvr
@@ -27,23 +29,26 @@
 		2012-04-18 取消更新文件上传进度信息逻辑。
 		2012-10-25 整合更新文件进度信息功能。减少客户端的AJAX调用。
 		2014-07-23 优化代码。
-		2015-03-19 客户端提供pathSvr，此页面减少一次访问数据库的操作。
 		2016-04-09 优化文件存储逻辑，增加更新文件夹进度逻辑
 */
 //String path = request.getContextPath();
 //String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
 String uid 			= "";// 		= request.getParameter("uid");
-String idSvr 		= "";// 		= request.getParameter("fid");
+String idSign 		= "";// 		= request.getParameter("fid");
 String perSvr 		= "";
 String lenSvr		= "";
 String lenLoc		= "";
+String nameLoc		= "";
+String pathLoc		= "";
+String sizeLoc		= "";
 String f_pos 		= "";// 	= request.getParameter("RangePos");
+String rangeIndex	= "1";
+String rangeCount	= "1";
 String complete		= "false";//文件块是否已发送完毕（最后一个文件块数据）
-String fd_idSvr		= "";
+String fd_idSign	= "";
 String fd_lenSvr	= "";
 String fd_perSvr	= "0%";
-String pathSvr		= "";//add(2015-03-19):服务器文件路径由客户端提供，此页面减少一次访问数据库的操作。
  
 // Check that we have a file upload request
 boolean isMultipart = ServletFileUpload.isMultipartContent(request);
@@ -76,16 +81,20 @@ while (fileItr.hasNext())
 		String fn = rangeFile.getFieldName();
 		String fv = rangeFile.getString(); 
 		if(fn.equals("uid")) uid = fv;
-		if(fn.equals("idSvr")) idSvr = fv;
+		if(fn.equals("idSign")) idSign = fv;
+		if(fn.equals("nameLoc")) nameLoc = fv;
+		if(fn.equals("pathLoc")) pathLoc = fv;
+		if(fn.equals("sizeLoc")) sizeLoc = fv;
 		if(fn.equals("lenSvr")) lenSvr = fv;
 		if(fn.equals("lenLoc")) lenLoc = fv;
 		if(fn.equals("perSvr")) perSvr = fv;
-		if(fn.equals("fd-idSvr")) fd_idSvr = fv;
+		if(fn.equals("RangePos")) f_pos = fv;
+		if(fn.equals("rangeIndex")) rangeIndex = fv;
+		if(fn.equals("rangeCount")) rangeCount = fv;
+		if(fn.equals("complete")) complete = fv;
+		if(fn.equals("fd-idSign")) fd_idSign = fv;
 		if(fn.equals("fd-lenSvr")) fd_lenSvr = fv;
 		if(fn.equals("fd-perSvr")) fd_perSvr = fv;
-		if(fn.equals("RangePos")) f_pos = fv;
-		if(fn.equals("complete")) complete = fv;
-		if(fn.equals("pathSvr")) pathSvr = fv;//add(2015-03-19):
 	}
 	else 
 	{
@@ -96,55 +105,67 @@ while (fileItr.hasNext())
 //参数为空
 if ( 	StringUtils.isBlank( lenSvr )
 	|| 	StringUtils.isBlank( uid )
-	|| 	StringUtils.isBlank( idSvr )
-	|| 	StringUtils.isBlank( f_pos) 
-	|| 	StringUtils.isBlank(pathSvr))
+	|| 	StringUtils.isBlank( idSign )
+	|| 	StringUtils.isBlank( f_pos))
 {
 	XDebug.Output("uid", uid);
-	XDebug.Output("idSvr", idSvr);
+	XDebug.Output("idSign", idSign);
 	XDebug.Output("f_pos", f_pos);
 	XDebug.Output("param is null");
 	return;
 }
-
-	pathSvr	= pathSvr.replace("+","%20");	
-	pathSvr = URLDecoder.decode(pathSvr,"UTF-8");//utf-8解码//客户端使用的是encodeURIComponent编码，
-
-	XDebug.Output("perSvr", perSvr);
-	XDebug.Output("lenSvr", lenSvr);
-	XDebug.Output("lenLoc", lenLoc);
-	XDebug.Output("uid", uid);
-	XDebug.Output("idSvr", idSvr);
-	XDebug.Output("f_pos", f_pos);
-	XDebug.Output("complete", complete);
-	XDebug.Output("pathSvr",pathSvr);
-	XDebug.Output("fd_idSvr",fd_idSvr);
-	XDebug.Output("fd_lenSvr",fd_lenSvr);
-	XDebug.Output("fd_perSvr",fd_perSvr);
+	pathLoc	= pathLoc.replace("+","%20");
+	pathLoc	= URLDecoder.decode(pathLoc,"UTF-8");//utf-8解码
 	
-	//保存文件块数据
-	FileBlockWriter res = new FileBlockWriter();	
-	res.write(pathSvr,Long.parseLong(f_pos),rangeFile);
+	Jedis j = JedisTool.con();
+	up7.biz.redis.file f_svr = new up7.biz.redis.file(j);
 	
-	//更新文件进度信息
-	DBFile db = new DBFile();
-	boolean fd = !StringUtils.isBlank(fd_idSvr);
-	if(fd) fd = !StringUtils.isBlank(fd_lenSvr);
-	if(fd) fd = Integer.parseInt(fd_idSvr)>0;
-	if(fd) fd = Long.parseLong(fd_lenSvr)>0;
+	up7.biz.file_part part = new up7.biz.file_part();
+	Boolean folder = false;
+	//文件块
+	if(StringUtils.isBlank(fd_idSign))
+	{
+		String ps = f_svr.getPartPath(idSign, rangeIndex);
+		part.save(ps,rangeFile);
+	}//子文件块
+	else
+	{
+		//向redis添加子文件信息
+		up7.model.xdb_files f_child = new up7.model.xdb_files();
+		f_child.blockCount = Integer.parseInt(rangeCount);
+		f_child.idSign = idSign;
+		File path_loc = new File(pathLoc);
+		f_child.nameLoc = path_loc.getName();
+		f_child.nameSvr = nameLoc;
+		f_child.lenLoc = Long.parseLong( lenLoc );
+		f_child.sizeLoc = f_child.lenLoc<1024 ? PathTool.getDataSize(f_child.lenLoc) : sizeLoc;
+		f_child.pathLoc = pathLoc.replace("\\","/");//路径规范化处理
+		f_child.rootSign = fd_idSign;
+		
+		f_svr.create(f_child);
+		
+		//添加到文件夹
+		up7.biz.folder.fd_files_redis root = new up7.biz.folder.fd_files_redis(j,fd_idSign);
+		root.add(idSign);
+		
+		//块路径
+		String fpathSvr = f_svr.getPartPath(idSign,rangeIndex,rangeCount,fd_idSign);
+		
+		//保存块
+		part.save(fpathSvr,rangeFile);
+		folder  = true;
+	}
 	
 	//第一块数据
 	if(Long.parseLong(f_pos) == 0 )
 	{
-		if(fd)
-		{		
-			boolean cmp = StringUtils.equals(complete,"true");
-			db.fd_fileProcess(Integer.parseInt(uid),Integer.parseInt(idSvr),Long.parseLong(f_pos),Long.parseLong(lenSvr),perSvr,Integer.parseInt(fd_idSvr),Long.parseLong(fd_lenSvr),fd_perSvr,cmp);
-		}
-		else
-		{
-			db.f_process(Integer.parseInt(uid),Integer.parseInt(idSvr),Long.parseLong(f_pos),Long.parseLong(lenSvr),perSvr);		
-		}	
+		//更新文件进度
+		f_svr.process(idSign,perSvr,lenSvr);
+		
+		//更新文件夹进度
+		if(folder) f_svr.process(fd_idSign,fd_perSvr,fd_lenSvr);
 	}
+	j.close();
 			
-	out.write("ok");%>
+	out.write("ok");
+%>

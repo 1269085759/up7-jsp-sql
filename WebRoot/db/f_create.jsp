@@ -1,8 +1,10 @@
 <%@ page language="java" import="up7.*" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@	
 	page import="net.sf.json.*" %><%@
+	page import="redis.clients.jedis.Jedis" %><%@
 	page import="up7.biz.*" %><%@	
-	page import="up7.model.*" %><%@ 
+	page import="up7.model.*" %><%@
+	page import="up7.biz.redis.*" %><%@ 
 	page import="org.apache.commons.lang.StringUtils" %><%@
 	page import="java.net.URLDecoder" %><%@
 	page import="java.net.URLEncoder" %><%/*
@@ -16,6 +18,7 @@
 			优化导入包
 			优化变量名称
 		2016-04-09 完善逻辑。
+		2017-05-05 取消添加数据库操作，在文件上传完后添加到数据库
 */
 
 String md5 			= request.getParameter("md5");
@@ -24,6 +27,7 @@ String lenLoc 		= request.getParameter("lenLoc");//数字化的文件大小。12
 String sizeLoc 		= request.getParameter("sizeLoc");//格式化的文件大小。10MB
 String callback     = request.getParameter("callback");
 String pathLoc		= request.getParameter("pathLoc");
+String idSign		= request.getParameter("idSign");
 pathLoc			= pathLoc.replace("+","%20");
 pathLoc			= URLDecoder.decode(pathLoc,"UTF-8");//utf-8解码
 
@@ -37,6 +41,7 @@ if (	StringUtils.isBlank(md5)
 }
 
 xdb_files fileSvr= new xdb_files();
+fileSvr.idSign = idSign;
 fileSvr.f_fdChild = false;
 fileSvr.uid = Integer.parseInt(uid);
 fileSvr.nameLoc = PathTool.getName(pathLoc);
@@ -50,23 +55,17 @@ fileSvr.nameSvr = fileSvr.nameLoc;
 PathGuidBuilder pb = new PathGuidBuilder();
 fileSvr.pathSvr = pb.genFile(fileSvr.uid,fileSvr);
 
-//添加记录
-DBFile db = new DBFile();	
-fileSvr.idSvr = db.Add(fileSvr);
+//添加到redis
+Jedis j = JedisTool.con();
+tasks taskSvr = new tasks(j);
+taskSvr.uid = uid;
+taskSvr.add(fileSvr);
+j.close();
 
-//创建文件
-FileBlockWriter fr = new FileBlockWriter();
-Boolean ret = fr.make(fileSvr.pathSvr,fileSvr.lenLoc);		
-if(!ret)
-{
-	out.write(callback + "({\"value\":null,\"err\":true,\"inf\":\"创建文件错误，请检查存储路径是否正确，磁盘空间是否不足。\"})");
-}
-else
-{
-	JSONObject obj = JSONObject.fromObject(fileSvr);
-	String json = obj.toString();
-	json = URLEncoder.encode(json,"UTF-8");//编码，防止中文乱码
-	json = json.replace("+","%20");
-	json = callback + "({\"value\":\"" + json + "\"})";//返回jsonp格式数据。
-	out.write(json);
-}%>
+JSONObject obj = JSONObject.fromObject(fileSvr);
+String json = obj.toString();
+json = URLEncoder.encode(json,"UTF-8");//编码，防止中文乱码
+json = json.replace("+","%20");
+json = callback + "({\"value\":\"" + json + "\"})";//返回jsonp格式数据。
+out.write(json);
+%>

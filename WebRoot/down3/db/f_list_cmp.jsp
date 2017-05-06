@@ -2,6 +2,7 @@
 	page contentType="text/html;charset=UTF-8"%><%@ 
 	page import="down3.biz.*" %><%@
 	page import="down3.model.*" %><%@
+	page import="down3.biz.redis.*" %><%@
 	page import="java.net.URLDecoder" %><%@ 
 	page import="java.net.URLEncoder" %><%@ 
 	page import="org.apache.commons.lang.*" %><%@ 
@@ -26,8 +27,8 @@ String cbk  	 = request.getParameter("callback");//jsonp
 
 if (!StringUtils.isBlank(uid))
 {
-	cmp_builder cb = new cmp_builder();
-	String json = cb.read(Integer.parseInt(uid));
+	CompleteReader cb = new CompleteReader();
+	String json = cb.all(Integer.parseInt(uid));
 	if(!StringUtils.isBlank(json))
 	{
 		System.out.println("上传文件列表："+json);

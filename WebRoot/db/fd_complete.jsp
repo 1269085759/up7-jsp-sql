@@ -1,6 +1,8 @@
-<%@ page language="java" import="up7.DBFile" pageEncoding="UTF-8"%><%@
+<%@ page language="java" import="up7.*" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@ 
-	page import="up7.DBFolder" %><%@
+	page import="up7.biz.folder.*" %><%@
+	page import="up7.biz.redis.*" %><%@
+	page import="redis.clients.jedis.Jedis" %><%@
 	page import="org.apache.commons.lang.StringUtils" %><%
 /*
 	此页面主要更新文件夹数据表。已上传字段
@@ -10,17 +12,26 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
-String id_file	= request.getParameter("id_file");
-String id_fd	= request.getParameter("id_folder");
+String sign	= request.getParameter("idSign");
 String uid	= request.getParameter("uid");
 String cbk 	= request.getParameter("callback");//jsonp
 int ret = 0;
 
 //参数为空
-if (	!StringUtils.isBlank(uid)
-	||	!StringUtils.isBlank(id_fd))
+if (	!StringUtils.isBlank(sign))
 {
-	DBFile.fd_complete(id_file,id_fd,uid);
+	Jedis j = JedisTool.con();
+	fd_redis fd = new fd_redis(j);
+	fd.read(sign);
+	
+	//清除缓存
+	tasks svr = new tasks(j);
+	svr.uid = uid;
+	svr.delFd(sign);
+	j.close();
+	
+	fd.mergeAll();//合并文件块
+	fd.saveToDb();//保存到数据库
 	ret = 1;
 }
 out.write(cbk + "(" + ret + ")");

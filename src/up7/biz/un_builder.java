@@ -10,6 +10,7 @@ import java.util.Map;
 
 import up7.DbHelper;
 import up7.biz.folder.fd_file;
+import up7.biz.folder.fd_file_redis;
 
 import com.google.gson.Gson;
 
@@ -101,7 +102,7 @@ public class un_builder
             }//没有文件夹，先创建一个空文件夹
             else
             {
-                f.files = new ArrayList<fd_file>();
+                f.files = new ArrayList<fd_file_redis>();
                 this.folders.put(f.pidRoot, files.size());
                 this.files.add(f);
             }
@@ -126,8 +127,8 @@ public class un_builder
             un_file fd = new un_file();
             //fd.idSvr = pidRoot;
             fd.fdID = pidRoot;
-            fd.files = new ArrayList<fd_file>();
-            fd.files.add(f);
+            fd.files = new ArrayList<fd_file_redis>();
+            //fd.files.add(f);
 
             this.folders.put(pidRoot, this.files.size());
             this.files.add(fd);
@@ -135,7 +136,7 @@ public class un_builder
         else
         {
         	int fd_index = this.folders.get(pidRoot);
-        	this.files.get(fd_index).files.add(f);
+        	//this.files.get(fd_index).files.add(f);
         }
     }
 

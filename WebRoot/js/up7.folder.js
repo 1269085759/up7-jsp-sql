@@ -10,7 +10,7 @@ function FolderUploader(idLoc, fdLoc, mgr)
     this.idLoc = idLoc;
     this.isFolder = true; //是文件夹
     this.folderInit = false;//文件夹已初始化
-    this.folderSvr = { nameLoc: "",nameSvr:"",lenLoc:0,sizeLoc: "0byte", lenSvr: 0,perSvr:"0%", pidLoc: 0, pidSvr: 0, idLoc: 0, idSvr: 0, idFile:0,uid: 0, foldersCount: 0, filesCount: 0, filesComplete: 0, pathLoc: "", pathSvr: "", pathRel: "", pidRoot: 0, complete: false, folders: [], files: [] };
+    this.folderSvr = { nameLoc: "",nameSvr:"",lenLoc:0,sizeLoc: "0byte", lenSvr: 0,perSvr:"0%", idSign: 0, uid: 0, foldersCount: 0, filesCount: 0, filesComplete: 0, pathLoc: "", pathSvr: "", pathRel: "", pidRoot: 0, complete: false, folders: [], files: [] };
     jQuery.extend(true,this.folderSvr, fdLoc);//续传信息
     this.folderSvr.idLoc = idLoc;
     this.manager = mgr;
@@ -30,10 +30,9 @@ function FolderUploader(idLoc, fdLoc, mgr)
         this.ui.msg.text("正在上传队列中等待...");
         this.State = HttpUploaderState.Ready;
     };
-    this.svr_create = function (fdSvr)
+    this.svr_create = function ()
     {
-		jQuery.extend(this.folderSvr,fdSvr);
-        if (fdSvr.complete)
+        if (this.folderSvr.lenLoc==0)
         {
             this.all_complete();
             return;
@@ -56,7 +55,7 @@ function FolderUploader(idLoc, fdLoc, mgr)
     };
     this.svr_update = function ()
     {
-        var param = jQuery.extend({}, this.fields, { uid: this.folderSvr.uid, sign: this.folderSvr.sign, idSvr: this.folderSvr.idSvr, lenSvr: this.folderSvr.lenSvr, perSvr: this.folderSvr.perSvr, time: new Date().getTime() });
+        var param = jQuery.extend({}, this.fields, { uid: this.folderSvr.uid, sign: this.folderSvr.sign, idSign: this.folderSvr.idSign, lenSvr: this.folderSvr.lenSvr, perSvr: this.folderSvr.perSvr, time: new Date().getTime() });
         $.ajax({
             type: "GET"
             , dataType: 'jsonp'
@@ -87,18 +86,27 @@ function FolderUploader(idLoc, fdLoc, mgr)
             if (!this.check_opened()) return;
             //在此处增加服务器验证代码。
             this.ui.msg.text("初始化...");
-            var f_data = jQuery.extend({}, this.fields, { folder: encodeURIComponent(JSON.stringify(this.folderSvr)), time: new Date().getTime() });
+            var loc_path = encodeURIComponent(this.folderSvr.pathLoc);
+            var f_data = jQuery.extend({}, this.fields, {
+                nameLoc: this.folderSvr.nameLoc
+                , pathLoc: loc_path
+                , idSign: this.folderSvr.idSign
+                , lenLoc: this.folderSvr.lenLoc
+                , sizeLoc: this.folderSvr.sizeLoc
+                , filesCount: this.folderSvr.filesCount
+                , uid: this.folderSvr.uid
+                , time: new Date().getTime()
+            });
 
             $.ajax({
-                type: "POST"
-                //, dataType: 'jsonp'
-                //, jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
+                type: "GET"
+                , dataType: 'jsonp'
+                , jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
                 , url: this.Config["UrlFdCreate"]
                 , data: f_data
                 , success: function (msg)
                 {
-                    var json = JSON.parse(decodeURIComponent(msg));
-                    _this.svr_create(json);
+                    _this.svr_create();
                 }
                 , error: function (req, txt, err)
                 {
@@ -224,7 +232,7 @@ function FolderUploader(idLoc, fdLoc, mgr)
 			, dataType: 'jsonp'
 			, jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
 			, url: this.Config["UrlFdComplete"]
-			, data: { uid: this.fields["uid"], id_folder: this.folderSvr.fdID,id_file:this.folderSvr.idFile, time: new Date().getTime() }
+			, data: { uid: this.fields["uid"], idSign: this.folderSvr.idSign,time: new Date().getTime() }
 			, success: function (msg)
 			{
 			    //添加到文件列表

@@ -11,6 +11,9 @@ public class DnFileInf
     @SerializedName("idSvr")
     public int idSvr=0;
     
+    @SerializedName("idSign")
+    public String idSign="";
+    
     @SerializedName("uid")
     public int uid =0;
     

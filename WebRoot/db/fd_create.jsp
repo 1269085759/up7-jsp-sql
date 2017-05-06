@@ -1,9 +1,14 @@
 <%@ page language="java" import="up7.*" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@ 
 	page import="com.google.gson.*" %><%@
+	page import="net.sf.json.*" %><%@
+	page import="java.io.*" %><%@
 	page import="up7.*" %><%@
 	page import="up7.biz.*" %><%@
 	page import="up7.biz.folder.*" %><%@
+	page import="up7.model.*" %><%@
+	page import="up7.biz.redis.*" %><%@
+	page import="redis.clients.jedis.Jedis" %><%@
 	page import="org.apache.commons.lang.StringUtils" %><%@
 	page import="java.net.URLDecoder" %><%@
 	page import="java.net.URLEncoder" %><%
@@ -39,6 +44,7 @@
 		2014-07-23 创建
 		2014-08-05 修复BUG，上传文件夹如果没有子文件夹时报错的问题。
 		2016-04-09 完善存储逻辑。
+		2017-05-03 仅将文件夹信息保存在redis中。
 
 	JSON格式化工具：http://tool.oschina.net/codeformat/json
 	POST数据过大导致接收到的参数为空解决方法：http://sishuok.com/forum/posts/list/2048.html
@@ -46,26 +52,43 @@
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
-String folderStr = request.getParameter("folder");
-folderStr = folderStr.replace("+","%20");
-//客户端使用的是encodeURIComponent编码，
-folderStr = URLDecoder.decode(folderStr,"UTF-8");//utf-8解码
+String idSign = request.getParameter("idSign");
+String pathLoc = request.getParameter("pathLoc");
+pathLoc			= pathLoc.replace("+","%20");
+pathLoc			= URLDecoder.decode(pathLoc,"UTF-8");//utf-8解码
+String sizeLoc = request.getParameter("sizeLoc");
+String lenLoc = request.getParameter("lenLoc");
+String uid = request.getParameter("uid");
+String fCount	= request.getParameter("filesCount");
+String callback = request.getParameter("callback");
 
+File ps = new File(pathLoc);
+xdb_files f = new xdb_files();
+f.nameLoc = ps.getName();
+f.nameSvr = f.nameLoc;
+f.idSign = idSign;
+f.pathLoc = pathLoc;
+f.sizeLoc = sizeLoc;
+f.lenLoc = Long.parseLong(lenLoc);
+f.filesCount = Integer.parseInt(fCount);
+f.f_fdTask = true;
+//生成路径
+PathGuidBuilder pb = new PathGuidBuilder();
+f.pathSvr = pb.genFolder(0, f.nameLoc);
+PathTool.createDirectory(f.pathSvr);	
 
-//参数为空
-if ( StringUtils.isBlank(folderStr) )
-{
-	out.write("param is null\n");
-	return;
-}
+Jedis j = JedisTool.con();
+//添加到任务
+tasks svr = new tasks(j);
+svr.uid = uid;
+svr.add(f);
+j.close();
 
-fd_appender adder = new fd_appender();
-Gson g = new Gson();
-adder.m_root = g.fromJson(folderStr,fd_root.class);
-adder.save();//保存到数据库
-
-String json = g.toJson(adder.m_root);
-json = URLEncoder.encode(json,"utf-8");
+JSONObject obj = JSONObject.fromObject(f);
+String json = obj.toString();
+json = URLEncoder.encode(json,"UTF-8");//编码，防止中文乱码
 json = json.replace("+","%20");
+
+json = callback + "({\"ret\":\"" + json + "\"})";//返回jsonp格式数据。
 out.write(json);
 %>
