@@ -27,12 +27,14 @@ function FileDownloader(fileLoc, mgr)
     this.browser = mgr.browser;
     this.Manager = mgr;
     this.Config = mgr.Config;
-    this.fields = jQuery.extend({},mgr.Fields);//每一个对象自带一个fields幅本
+    this.fields = jQuery.extend({}, mgr.Fields, { nameLoc: encodeURIComponent(fileLoc.nameLoc), sizeSvr: fileLoc.sizeSvr });//每一个对象自带一个fields幅本
     this.State = HttpDownloaderState.None;
     this.event = mgr.event;
     this.fileSvr = {
           id:0//累加，唯一标识
         , idSvr: 0
+        , idSign: ""
+        , signSvr: ""
         , uid: 0
         , nameLoc: ""//自定义文件名称
         , folderLoc: this.Config["Folder"]
@@ -46,6 +48,9 @@ function FileDownloader(fileLoc, mgr)
         , fdTask: false
     };
     jQuery.extend(this.fileSvr, fileLoc);//覆盖配置
+    jQuery.extend(this.fileSvr, { fields: this.fields });//附加字段
+    var url = mgr.Config["UrlDown"] + "?id=" + this.fileSvr.signSvr;
+    if (this.fileSvr.fileUrl.length < 1) this.fileSvr.fileUrl = url;
 
     this.hideBtns = function ()
     {
@@ -149,7 +154,7 @@ function FileDownloader(fileLoc, mgr)
             {
                 if (msg.value == null) return;
                 var json = JSON.parse(decodeURIComponent(msg.value));
-                _this.fileSvr.idSvr = json.idSvr;
+                _this.fileSvr.idSign = json.idSign;
                 //文件已经下载完
                 //if (_this.isComplete()) { _this.svr_delete(); }
             }
@@ -161,8 +166,7 @@ function FileDownloader(fileLoc, mgr)
     this.isComplete = function () { return this.State == HttpDownloaderState.Complete; };
     this.svr_delete = function ()
     {
-        if (this.fileSvr.idSvr == 0) return;
-        var param = jQuery.extend({}, this.fields,this.fileSvr, {time:new Date().getTime()});
+        var param = jQuery.extend({}, { uid: this.fileSvr.uid,signSvr:this.fileSvr.signSvr,time: new Date().getTime() });
         $.ajax({
             type: "GET"
             , dataType: 'jsonp'
@@ -191,11 +195,7 @@ function FileDownloader(fileLoc, mgr)
         //this.SvrDelete();
         this.Manager.filesCmp.push(this);
 
-        if (this.fileSvr.idSvr > 0)
-        {
-            this.svr_delete();
-        }
-
+        this.svr_delete();
     };
 
     this.down_recv_size = function (json)

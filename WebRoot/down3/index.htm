@@ -42,7 +42,8 @@
                         var name = f.nameLoc;
                         var idSvr = f.idSvr;
                         var size = f.sizeSvr;
-                        var url = downer.Config["UrlDown"] + "?fid=" + f.idSvr;
+                        var url = downer.Config["UrlDown"] + "?fid=" + f.signSvr;
+                        jQuery.extend(f, { fileUrl: url });
 
                         if (f.fdTask) { tdType.text("文件夹"); }
                         else { tdType.text("文件"); }
@@ -53,12 +54,12 @@
                             //文件夹
                             if (f.fdTask)
                             {
-                                var d = downer.add_folder(url, f, f.nameLoc);
+                                var d = downer.add_folder(f);
                                 if (d == null) return;//
                             }
                             else
                             {
-                                var d = downer.add_file(url, f.nameLoc);
+                                var d = downer.add_file(f);
                                 if (d == null) return;//
                                 d.ui.size.text(f.sizeSvr);
                                 d.ui.name.text(f.nameLoc);

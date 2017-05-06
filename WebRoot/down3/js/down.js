@@ -104,7 +104,7 @@ function DownloaderMgr()
 	
 	this.idCount = 1; 	//上传项总数，只累加
 	this.queueCount = 0;//队列总数
-	this.filesMap = new Object(); //本地文件列表映射表
+	this.filesMap = new Object(); //本地文件列表映射表,signSvr,obj-json
 	this.filesCmp = new Array();//已完成列表
 	this.filesUrl = new Array();
 	this.spliter = null;
@@ -184,23 +184,20 @@ function DownloaderMgr()
 	    });
 	    this.filesCmp.length = 0;
 	};
-	this.add_ui = function (fd/*是否是文件夹*/,url, f_name)
+	this.add_ui = function (fd/*是否是文件夹*/,fileSvr)
 	{
 	    //存在相同项
-	    if (this.exist_url(url)) return null;
-	    this.filesUrl.push(url);
+	    if (this.exist_url(fileSvr.fileUrl)) return null;
+        this.filesUrl.push(fileSvr.fileUrl);
 
 	    var _this = this;
-	    var fileNameArray = url.split("/");
-	    var fileName = fileNameArray[fileNameArray.length - 1];
-	    var fid = this.idCount++;
+        var fileNameArray = fileSvr.fileUrl.split("/");
 	    //自定义文件名称
-	    var fileLoc = { fileUrl: url, id: fid };
+        var fileLoc = { fileUrl: fileSvr.fileUrl};
 	    //自定义名称
 	    if (typeof (f_name) == "string")
 	    {
 	        jQuery.extend(fileLoc, { nameCustom: f_name });
-	        fileName = f_name;
 	    }
 
 	    var ui = this.tmpFile.clone();
@@ -224,14 +221,14 @@ function DownloaderMgr()
 	    var ui_eles = { ico:{file:uiIcoF,fd:uiIcoFD},msg: uiMsg, name: uiName, size: uiSize, process: uiProcess, percent: uiPercent, btn: { cancel: btnCancel, stop: btnStop, down: btnDown, del: btnDel }, div: ui, split: sp };
 
 	    var downer;
-	    if (fd) { downer = new FdDownloader(fileLoc, this); }
-	    else { downer = new FileDownloader(fileLoc,this);}
+        if (fd) { downer = new FdDownloader(fileSvr, this); }
+        else { downer = new FileDownloader(fileSvr,this);}
 	    //var downer = new FileDownloader(fileLoc, this);
-	    this.filesMap[fid] = downer;//
+	    this.filesMap[fileSvr.signSvr] = downer;//
 	    jQuery.extend(downer.ui, ui_eles);
 
-	    uiName.text(fileName);
-	    uiName.attr("title", url);
+        uiName.text(fileSvr.nameLoc);
+        uiName.attr("title", fileSvr.fileUrl);
 	    uiMsg.text("");
 	    uiSize.text("0字节");
 	    uiPercent.text("(0%)");
@@ -245,16 +242,17 @@ function DownloaderMgr()
 	};
 	this.resume_file = function (fileSvr)
 	{
-	    var f = this.add_ui(false,fileSvr.fileUrl, fileSvr.nameLoc);
-	    f.ui.size.text(fileSvr.sizeSvr);
+        var f = this.add_ui(false, fileSvr);
+        f.ui.size.text(fileSvr.sizeSvr);
+        f.ui.name.text(fileSvr.nameLoc);
 	    f.ui.process.css("width", fileSvr.perLoc);
 	    f.ui.percent.text("(" + fileSvr.perLoc + ")");
-	    jQuery.extend(f.fileSvr, fileSvr);
+	    //jQuery.extend(f.fileSvr, fileSvr);
 	    f.addQueue();//添加到队列
 	};
 	this.resume_folder = function (fdSvr)
 	{	    
-	    var obj = this.add_ui(true, fdSvr.fileUrl, fdSvr.nameLoc);
+        var obj = this.add_ui(true, fdSvr);
 	    if (null == obj) return;
 
 	    obj.ui.ico.file.hide();
@@ -268,15 +266,15 @@ function DownloaderMgr()
 	    obj.addQueue();
 	    return obj;
 	};
-	this.add_file = function (url,f_name)
+	this.add_file = function (fileSvr)
 	{
-	    var obj = this.add_ui(false,url, f_name);
+        var obj = this.add_ui(false, fileSvr);
 	    if (obj != null) obj.addQueue();
 	    return obj;
 	};
-	this.add_folder = function (url,fdLoc,f_name)
+    this.add_folder = function (fileSvr)
 	{
-	    var obj = this.add_ui(true, url, f_name);
+        var obj = this.add_ui(true, fileSvr);
 	    if (null == obj) return;
 
 	    obj.ui.name.text(fdLoc.nameLoc);
@@ -307,47 +305,47 @@ function DownloaderMgr()
 	this.down_file = function (json) { };
 	this.init_end = function (json)
 	{
-	    var p = this.filesMap[json.id];
+	    var p = this.filesMap[json.signSvr];
 	    p.init_end(json);
 	};
 	this.down_begin = function (json)
 	{
-	    var p = this.filesMap[json.id];
+        var p = this.filesMap[json.signSvr];
 	    p.down_begin(json);
 	};
 	this.down_process = function (json)
 	{
-	    var p = this.filesMap[json.id];
+        var p = this.filesMap[json.signSvr];
 	    p.down_process(json);
 	};
 	this.down_part = function (json)
 	{
-	    var p = this.filesMap[json.id];
+        var p = this.filesMap[json.signSvr];
 	    p.down_part(json);
 	};
 	this.down_error = function (json)
 	{
-	    var p = this.filesMap[json.id];
+        var p = this.filesMap[json.signSvr];
 	    p.down_error(json);
 	};
 	this.down_recv_size = function (json)
 	{
-	    var p = this.filesMap[json.id];
+        var p = this.filesMap[json.signSvr];
 	    p.down_recv_size(json);
 	};
 	this.down_recv_name = function (json)
 	{
-	    var p = this.filesMap[json.id];
+        var p = this.filesMap[json.signSvr];
 	    p.down_recv_name(json);
 	};
 	this.down_complete = function (json)
 	{
-	    var p = this.filesMap[json.id];
+        var p = this.filesMap[json.signSvr];
 	    p.down_complete(json);
 	};
 	this.down_stoped = function (json)
 	{
-	    var p = this.filesMap[json.id];
+        var p = this.filesMap[json.signSvr];
 	    p.down_stoped(json);
 	};
 	this.start_queue = function () { this.browser.startQueue();};
@@ -492,7 +490,7 @@ function DownloaderMgr()
         , stopFile: function (f)
         {
             _this.queueCount--;
-            var param = { name: "stop_file", id: f.id, config: _this.Config };
+            var param = { name: "stop_file", signSvr: f.signSvr, config: _this.Config };
             this.postMessage(param);
         }
         , startQueue: function ()

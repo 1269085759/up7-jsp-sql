@@ -1,6 +1,9 @@
 <%@ page language="java" import="java.util.*" pageEncoding="UTF-8"%><%@ 
 	page contentType="text/html;charset=UTF-8"%><%@ 
 	page import="up7.*" %><%@
+	page import="redis.clients.jedis.Jedis" %><%@
+	page import="down3.biz.redis.*" %><%@
+	page import="down3.model.*" %><%@
 	page import="up7.model.*" %><%@ 
 	page import="java.net.URLDecoder" %><%@ 
 	page import="java.net.URLEncoder" %><%@ 
@@ -16,31 +19,83 @@
 			解决方法参考：http://stackoverflow.com/questions/1776142/getoutputstream-has-already-been-called-for-this-response
 	更新记录：
 		2015-05-13 创建
+		2017-05-06 增加业务逻辑数据，简化处理逻辑
 */
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
 
-String fid 	= request.getParameter("fid");
-if (StringUtils.isBlank(fid))
+String lenSvr 		= request.getHeader("x-down3-lenSvr");
+String nameLoc 		= request.getHeader("x-down3-nameLoc");
+String sizeSvr 		= request.getHeader("x-down3-sizeSvr");
+String pathSvr 		= request.getHeader("x-down3-pathSvr");
+String pathLoc 		= request.getHeader("x-down3-pathLoc");
+String blockIndex 	= request.getHeader("x-down3-blockIndex");
+String lenLoc 		= request.getHeader("x-down3-lenLoc");
+String signSvr 		= request.getHeader("x-down3-signSvr");
+String uid 			= request.getHeader("x-down3-uid");
+String percent		= request.getHeader("x-down3-percent");
+
+pathSvr	 = pathSvr.replaceAll("\\+","%20");
+pathLoc	 = pathLoc.replaceAll("\\+","%20");
+nameLoc	 = nameLoc.replaceAll("\\+","%20");
+pathSvr	 = URLDecoder.decode(pathSvr,"UTF-8");//utf-8解码
+pathLoc	 = URLDecoder.decode(pathLoc,"UTF-8");//utf-8解码
+nameLoc	 = URLDecoder.decode(nameLoc,"UTF-8");//utf-8解码
+
+if (	StringUtils.isEmpty(lenSvr)
+		||	StringUtils.isEmpty(sizeSvr)
+		||	StringUtils.isEmpty(pathSvr)
+		||	StringUtils.isEmpty(nameLoc)
+		||	StringUtils.isEmpty(pathLoc)
+		||	StringUtils.isEmpty(blockIndex)
+		||	StringUtils.isEmpty(lenLoc)
+		||	StringUtils.isEmpty(signSvr)
+		||	StringUtils.isEmpty(uid)
+		||	StringUtils.isEmpty(percent)
+		)
 {
-	return;
+		System.out.println("lenSvr:".concat(lenSvr));
+		System.out.println("nameLoc:".concat(nameLoc));
+		System.out.println("sizeSvr:".concat(sizeSvr));
+		System.out.println("pathSvr:".concat(pathSvr));
+		System.out.println("pathLoc:".concat(pathLoc));
+		System.out.println("blockIndex:".concat(blockIndex));
+		System.out.println("lenLoc:".concat(lenLoc));
+		System.out.println("signSvr:".concat(signSvr));
+		System.out.println("percent:".concat(percent));
+		System.out.println("f_down.jsp 业务逻辑参数为空。");
+		return;
 }
 
-xdb_files inf = new xdb_files();
-DBFile db = new DBFile();
-//文件不存在
-if(!db.GetFileInfByFid(Integer.parseInt(fid),inf))
+DnFileInf fileSvr = new DnFileInf();
+fileSvr.signSvr = signSvr;
+fileSvr.uid = Integer.parseInt(uid);
+fileSvr.lenLoc = Long.parseLong(lenLoc);
+fileSvr.lenSvr = Long.parseLong(lenSvr);
+fileSvr.sizeSvr = sizeSvr;
+fileSvr.perLoc = percent;
+fileSvr.pathSvr = pathSvr;
+fileSvr.pathLoc = pathLoc;
+fileSvr.nameLoc = nameLoc;
+
+//添加到缓存
+Jedis j = JedisTool.con();
+tasks svr = new tasks(uid,j);
+svr.add(fileSvr);
+j.close();
+
+//文件不存在（未创建下载任务）
+if( fileSvr == null)
 {
 	response.addHeader("Content-Range","0-0/0");
 	response.addHeader("Content-Length","0");
 	return;
 }
-File f = new File(inf.pathSvr);
-long fileLen = f.length();
-RandomAccessFile raf = new RandomAccessFile(inf.pathSvr,"r");
+long fileLen = fileSvr.lenSvr;
+RandomAccessFile raf = new RandomAccessFile(fileSvr.pathSvr,"r");
 FileInputStream in = new FileInputStream( raf.getFD() );
 
-String fileName = inf.nameLoc;//QQ.exe
+String fileName = fileSvr.nameLoc;//QQ.exe
 fileName = URLEncoder.encode(fileName,"UTF-8");
 fileName = fileName.replaceAll("\\+","%20");
 response.setContentType("application/x-download");
