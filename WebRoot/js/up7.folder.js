@@ -146,7 +146,7 @@ function FolderUploader(fdLoc, mgr)
         this.ui.btn.stop.show();
         this.ui.btn.post.hide();
         this.State = HttpUploaderState.Posting;
-        this.browser.postFolder({ folder: this.folderSvr, fields: this.fields });
+        this.browser.postFolder(jQuery.extend({}, this.folderSvr, { fields: this.fields }));
     };
     this.post_error = function (json)
     {
@@ -190,15 +190,15 @@ function FolderUploader(fdLoc, mgr)
         this.folderSvr.perSvr = json.percent;
         this.ui.percent.text("("+json.percent+")");
         this.ui.process.css("width", json.percent);
-        var str = "(" + json.fileIndex + "/" + json.fileCount + ") " + json.lenPost + " " + json.speed + " " + json.time;
+        var str = "(" + json.fileCmps + "/" + json.fileCount + ") " + json.lenPost + " " + json.speed + " " + json.time;
         this.ui.msg.text(str);
     };
     this.post_complete = function (json)
     {
         if (!json.all)
         {
-            this.folderSvr.files[json.id_f].complete = true;
-            this.folderSvr.filesComplete = json.compCount;//
+            //this.folderSvr.files[json.id_f].complete = true;
+            //this.folderSvr.filesComplete = json.compCount;//
             return;
         }
 
@@ -358,6 +358,8 @@ function FolderUploader(fdLoc, mgr)
     //从上传列表中删除上传任务
     this.remove = function ()
     {
+        //清除缓存
+        this.browser.delFolder({ idSign: this.folderSvr.idSign });
         this.manager.Delete(this.folderSvr.idSign);
         this.ui.div.remove();
         this.ui.split.remove();
