@@ -32,7 +32,7 @@ SET ANSI_PADDING OFF
 GO
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'文件夹名称' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'up7_folders', @level2type=N'COLUMN',@level2name=N'fd_name'
 GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'父级ID' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'up7_folders', @level2type=N'COLUMN',@level2name=N'fd_pid'
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'父级ID' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'up7_folders', @level2type=N'COLUMN',@level2name=N'fd_pidSign'
 GO
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'用户ID。' , @level0type=N'SCHEMA',@level0name=N'dbo', @level1type=N'TABLE',@level1name=N'up7_folders', @level2type=N'COLUMN',@level2name=N'fd_uid'
 GO

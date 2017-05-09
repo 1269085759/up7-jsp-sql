@@ -38,16 +38,13 @@ CREATE TABLE [dbo].[up7_files](
 GO
 SET ANSI_PADDING OFF
 GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'父级文件夹ID' ,@level0type=N'SCHEMA', @level0name=N'dbo', @level1type=N'TABLE', @level1name=N'up7_files', @level2type=N'COLUMN', @level2name=N'f_pid'
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'父级文件夹ID' ,@level0type=N'SCHEMA', @level0name=N'dbo', @level1type=N'TABLE', @level1name=N'up7_files', @level2type=N'COLUMN', @level2name=N'f_pidSign'
 
 GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'根级文件夹ID' ,@level0type=N'SCHEMA', @level0name=N'dbo', @level1type=N'TABLE', @level1name=N'up7_files', @level2type=N'COLUMN', @level2name=N'f_pidRoot'
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'根级文件夹ID' ,@level0type=N'SCHEMA', @level0name=N'dbo', @level1type=N'TABLE', @level1name=N'up7_files', @level2type=N'COLUMN', @level2name=N'f_rootSign'
 
 GO
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'表示是否是一个文件夹上传任务' ,@level0type=N'SCHEMA', @level0name=N'dbo', @level1type=N'TABLE', @level1name=N'up7_files', @level2type=N'COLUMN', @level2name=N'f_fdTask'
-
-GO
-EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'文件夹详细ID，与up6_folders.fd_id对应' ,@level0type=N'SCHEMA', @level0name=N'dbo', @level1type=N'TABLE', @level1name=N'up7_files', @level2type=N'COLUMN', @level2name=N'f_fdID'
 
 GO
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'是否是文件夹中的子项' ,@level0type=N'SCHEMA', @level0name=N'dbo', @level1type=N'TABLE', @level1name=N'up7_files', @level2type=N'COLUMN', @level2name=N'f_fdChild'
