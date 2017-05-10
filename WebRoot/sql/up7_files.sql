@@ -23,6 +23,7 @@ CREATE TABLE [dbo].[up7_files](
 	[f_lenLoc] [bigint] NULL CONSTRAINT [DF_up7_files_f_lenLoc]  DEFAULT ((0)),
 	[f_sizeLoc] [varchar](15) COLLATE Chinese_PRC_CI_AS NULL CONSTRAINT [DF_up7_files_f_sizeLoc]  DEFAULT ('0Bytes'),
 	[f_pos] [bigint] NULL CONSTRAINT [DF_up7_files_f_pos]  DEFAULT ((0)),
+	[f_blockCount] [int] NULL CONSTRAINT [DF_up7_files_f_blockCount]  DEFAULT ((1)),
 	[f_lenSvr] [bigint] NULL CONSTRAINT [DF_up7_files_f_lenSvr]  DEFAULT ((0)),
 	[f_perSvr] [varchar](6) COLLATE Chinese_PRC_CI_AS NULL CONSTRAINT [DF_up7_files_f_perSvr]  DEFAULT ('0%'),
 	[f_complete] [bit] NULL CONSTRAINT [DF_up7_files_f_complete]  DEFAULT ((0)),
@@ -85,6 +86,9 @@ GO
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'文件续传位置。
 最大值：9,223,372,036,854,775,807
 ' ,@level0type=N'SCHEMA', @level0name=N'dbo', @level1type=N'TABLE', @level1name=N'up7_files', @level2type=N'COLUMN', @level2name=N'f_pos'
+
+GO
+EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'文件块总数' ,@level0type=N'SCHEMA', @level0name=N'dbo', @level1type=N'TABLE', @level1name=N'up7_files', @level2type=N'COLUMN', @level2name=N'f_blockCount'
 
 GO
 EXEC sys.sp_addextendedproperty @name=N'MS_Description', @value=N'已上传长度。以字节为单位。
