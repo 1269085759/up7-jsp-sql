@@ -1,5 +1,4 @@
 package up7.biz.folder;
-
 import java.util.UUID;
 
 public class fd_file 
@@ -13,16 +12,18 @@ public class fd_file
     public String pathSvr = "";
     public String pathRel = "";
     public String md5 = "";
-    public String sign = UUID.randomUUID().toString().replace("-", "");
     public int pidLoc = 0;
     public int pidSvr = 0;
     public String pidSign="";//父级目录guid
     public int pidRoot = 0;//
     public String rootSign="";//根级目录sign
+    public int blockCount=0;//块总数
+    public int blockSize=0;//逻辑块大小
     public int fdID = 0;//与up6_folders.fd_id对应，提供给文件夹使用。
     public Boolean fdChild=false;//是否是一个子文件
     public long lenLoc = 0;
     public String sizeLoc = "0";//sizeLoc
+    public String signSvr=UUID.randomUUID().toString();
     public long pos;//上传位置
     public long lenSvr = 0;
     public String perSvr = "0%";
@@ -31,5 +32,5 @@ public class fd_file
     public int foldersCount = 0;
     public Boolean complete = false;
     public Boolean fdTask = false;
-
+    public String sign = UUID.randomUUID().toString().replace("-", "");
 }

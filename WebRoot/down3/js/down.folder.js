@@ -27,6 +27,7 @@
         ,files:null
     };
     jQuery.extend(this.fileSvr, fileLoc);//覆盖配置
+    jQuery.extend(this.files, { fields: this.fields };
 
     this.hideBtns = function ()
     {
@@ -44,19 +45,6 @@
         this.ui.btn.cancel.show();
         this.ui.msg.text("正在下载队列中等待...");
         this.State = HttpDownloaderState.Ready;
-    };
-
-    //初始化文件,url
-    this.initFiles = function ()
-    {
-        var l = this.fileSvr.files.length;
-        for(var i = 0 ;i<l;++i)
-        {
-            this.fileSvr.files[i].fileUrl = this.Config["UrlDown"] + "?fid=" + this.fileSvr.files[i].idSvr;
-            jQuery.extend(this.fileSvr.files[i], { id: i });
-            this.fileSvr.files[i].idSvr = 0;//
-            this.fileSvr.idSvr = 0;
-        }
     };
 
     this.addQueue = function ()
@@ -136,8 +124,7 @@
     //添加记录
     this.svr_create = function ()
     {
-        //已记录将不再记录
-        if (this.fileSvr.idSvr) return;
+        return;
         this.ui.btn.down.hide();
         this.ui.msg.text("正在初始化...");
         var param = jQuery.extend({}, this.fields, {time: new Date().getTime() });
@@ -150,8 +137,8 @@
             , data: param
             , success: function (msg)
             {
-                var json = JSON.parse(decodeURIComponent(msg));
-                jQuery.extend(true, _this.fileSvr, json);
+                //var json = JSON.parse(decodeURIComponent(msg));
+                //jQuery.extend(true, _this.fileSvr, json);
                 ptr.ui.btn.down.show();
                 ptr.ui.msg.text("初始化完毕...");
             }
@@ -215,11 +202,11 @@
         }
         else
         {
-            var f = this.fileSvr.files[json.file.id];
-            f.complete = true;
-            f.lenLoc = f.lenSvr;
-            this.fileSvr.success = json.success;
-            this.svr_delete_file(f.idSvr);
+            //var f = this.fileSvr.files[json.file.id];
+            //f.complete = true;
+            //f.lenLoc = f.lenSvr;
+            //this.fileSvr.success = json.success;
+            //this.svr_delete_file(f.idSvr);
             //this.svr_update(null);//更新文件夹进度
         }
     };
@@ -245,13 +232,13 @@
         this.fileSvr.lenLoc = json.lenLoc;//保存进度
         this.fileSvr.perLoc = json.percent;
         //更新文件进度
-        this.fileSvr.files[json.file.id];
-        this.fileSvr.files[json.file.id].lenLoc = json.file.lenLoc;
-        this.fileSvr.files[json.file.id].percent = json.file.percent;
+        //this.fileSvr.files[json.file.id];
+        //this.fileSvr.files[json.file.id].lenLoc = json.file.lenLoc;
+        //this.fileSvr.files[json.file.id].percent = json.file.percent;
 
         this.ui.percent.text("("+json.percent+")");
         this.ui.process.css("width", json.percent);
-        var msg = [json.file.id + 1, "/", this.fileSvr.files.length, " ", json.sizeLoc, " ", json.speed, " ", json.time];
+        var msg = [json.fileIndex + 1, "/", json.filesCount, " ", json.sizeLoc, " ", json.speed, " ", json.time];
         this.ui.msg.text(msg.join(""));
     };
 
@@ -277,7 +264,8 @@
         this.ui.btn.down.show();
         this.ui.btn.del.show();
         this.event.downError(this, json.code);//biz event
-        this.ui.msg.text(DownloadErrorCode[json.code+""]);
+        if (json.msg.length > 1) { this.ui.msg.text(json.msg); }
+        else { this.ui.msg.text(DownloadErrorCode[json.code + ""]); }
         this.State = HttpDownloaderState.Error;
         //this.SvrUpdate();
     };
