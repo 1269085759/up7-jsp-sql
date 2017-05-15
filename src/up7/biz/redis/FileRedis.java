@@ -9,14 +9,14 @@ import redis.clients.jedis.Jedis;
 import up7.JedisTool;
 import up7.model.xdb_files;
 
-public class file 
+public class FileRedis 
 {
 	Jedis con=null;
-	public file(Jedis c)
+	public FileRedis(Jedis c)
 	{
 		this.con = c;
 	}
-	public file()
+	public FileRedis()
 	{		
 	}
 	Jedis getCon()
@@ -50,8 +50,10 @@ public class file
 		
 		j.hset(f.idSign, "fdTask", f.f_fdTask==true?"true":"false");
 		j.hset(f.idSign, "rootSign", f.rootSign);
+		j.hset(f.idSign, "pidSign", f.pidSign);
 		j.hset(f.idSign, "pathLoc", f.pathLoc);
 		j.hset(f.idSign, "pathSvr", f.pathSvr);
+		j.hset(f.idSign, "blockPath", f.blockPath);
 		j.hset(f.idSign, "nameLoc", f.nameLoc);
 		j.hset(f.idSign, "nameSvr", f.nameSvr);
 		j.hset(f.idSign, "lenLoc", Long.toString(f.lenLoc) );
@@ -69,14 +71,19 @@ public class file
 		
 		xdb_files f = new xdb_files();
 		f.idSign = idSign;
+		f.rootSign = j.hget(idSign, "rootSign");
+		f.pidSign = j.hget(idSign, "pidSign");
 		f.pathLoc = j.hget(idSign, "pathLoc");
 		f.pathSvr = j.hget(idSign, "pathSvr");
+		f.blockPath = j.hget(idSign, "blockPath");
 		f.nameLoc = j.hget(idSign, "nameLoc");
 		f.nameSvr = j.hget(idSign, "nameSvr");
 		f.lenLoc = Long.parseLong(j.hget(idSign, "lenLoc") );
 		f.sizeLoc = j.hget(idSign, "sizeLoc");
 		f.blockCount = Integer.parseInt(j.hget(idSign, "blockCount"));
-		f.blockSize = Integer.parseInt(j.hget(idSign, "blockSize"));
+		String blockSize = j.hget(idSign, "blockSize");
+		if(null == blockSize) blockSize="0";
+		f.blockSize = Integer.parseInt(blockSize);
 		f.filesCount = Integer.parseInt( j.hget(idSign, "filesCount") );
 		return f;
 	}

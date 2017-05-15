@@ -25,6 +25,7 @@ CREATE TABLE [dbo].[up7_files](
 	[f_pos] [bigint] NULL CONSTRAINT [DF_up7_files_f_pos]  DEFAULT ((0)),
 	[f_blockCount] [int] NULL CONSTRAINT [DF_up7_files_f_blockCount]  DEFAULT ((1)),
 	[f_blockSize] [int] NULL CONSTRAINT [DF_up7_files_f_blockSize]  DEFAULT ((0)),
+	[f_blockPath] [varchar](1000) NULL CONSTRAINT [DF_up7_files_f_blockPath]  DEFAULT (''),
 	[f_lenSvr] [bigint] NULL CONSTRAINT [DF_up7_files_f_lenSvr]  DEFAULT ((0)),
 	[f_perSvr] [varchar](6) COLLATE Chinese_PRC_CI_AS NULL CONSTRAINT [DF_up7_files_f_perSvr]  DEFAULT ('0%'),
 	[f_complete] [bit] NULL CONSTRAINT [DF_up7_files_f_complete]  DEFAULT ((0)),

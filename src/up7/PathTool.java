@@ -53,11 +53,11 @@ public class PathTool {
 		if(!split)
 		{
 			File ps = new File(a.concat("/").concat(b));
-			return ps.getCanonicalPath();
+			return ps.getCanonicalPath().replace('\\', '/');
 		}//有斜框
 		else{
 			File ps = new File(a.concat(b));
-			return ps.getCanonicalPath();
+			return ps.getCanonicalPath().replace('\\', '/');
 		}
 	}
 	/**

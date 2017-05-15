@@ -1,7 +1,10 @@
 <%@ page language="java" import="up7.*" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@
 	page import="java.io.*" %><%@
-	page import="up7.biz.folder.*" %><%@ 
+	page import="up7.biz.folder.*" %><%@
+	page import="up7.biz.*" %><%@
+	page import="up7.model.*" %><%@
+	page import="up7.biz.redis.*" %><%@ 
 	page import="up7.FileBlockWriter" %><%@
 	page import="up7.XDebug" %><%@
 	page import="org.apache.commons.fileupload.FileItem" %><%@
@@ -30,6 +33,7 @@
 		2012-10-25 整合更新文件进度信息功能。减少客户端的AJAX调用。
 		2014-07-23 优化代码。
 		2016-04-09 优化文件存储逻辑，增加更新文件夹进度逻辑
+		2017-05-14 优化参数传递方式，改为使用head方式传递参数
 */
 //String path = request.getContextPath();
 //String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -96,18 +100,28 @@ if ( 	StringUtils.isBlank( lenSvr )
 }
 	
 	Jedis j = JedisTool.con();
-	up7.biz.redis.file f_svr = new up7.biz.redis.file(j);
+	FileRedis cache = new FileRedis(j);
 	
-	up7.biz.file_part part = new up7.biz.file_part();
-	Boolean folder = false;
 	//文件块
 	if(StringUtils.isBlank(fd_idSign))
 	{
-		String ps = f_svr.getPartPath(idSign, rangeIndex);
+		//从缓存中取文件信息
+		xdb_files fileSvr = cache.read(idSign);
+		
+		//生成文件块路径
+		BlockPathBuilder bpb = new BlockPathBuilder();
+		String partPath = bpb.part(idSign,rangeIndex,fileSvr.pathSvr);
+		String ps = cache.getPartPath(idSign, rangeIndex);
+		
+		//保存文件块
+		up7.biz.file_part part = new up7.biz.file_part();
 		part.save(ps,rangeFile);
 	}//子文件块
 	else
 	{
+		//取根文件夹信息
+		xdb_files fd = cache.read(fd_idSign);
+		
 		//向redis添加子文件信息
 		up7.model.xdb_files f_child = new up7.model.xdb_files();
 		f_child.blockCount = Integer.parseInt(rangeCount);
@@ -118,30 +132,31 @@ if ( 	StringUtils.isBlank( lenSvr )
 		f_child.lenLoc = Long.parseLong( lenLoc );
 		f_child.sizeLoc = f_child.lenLoc<1024 ? PathTool.getDataSize(f_child.lenLoc) : sizeLoc;
 		f_child.pathLoc = pathLoc.replace("\\","/");//路径规范化处理
+		f_child.pathSvr = pathLoc.replace(fd.pathLoc,fd.pathSvr);
+		f_child.pathSvr = f_child.pathSvr.replace('\\','/');
+		f_child.pathRel = pathLoc.replace(fd.pathLoc,"");
 		f_child.rootSign = fd_idSign;
-		
-		f_svr.create(f_child);
+		f_child.blockCount = Integer.parseInt(rangeCount);
+		//子文件块路径
+        BlockPathBuilder bpb = new BlockPathBuilder();
+		f_child.blockPath = bpb.rootFd(idSign,rangeIndex,fd); 
+				
+		//将文件信息添加到缓存,文件夹上传完毕后会将缓存数据写入数据库
+		cache.create(f_child);
 		
 		//添加到文件夹
 		up7.biz.folder.fd_files_redis root = new up7.biz.folder.fd_files_redis(j,fd_idSign);
 		root.add(idSign);
 		
 		//块路径
-		String fpathSvr = f_svr.getPartPath(idSign,rangeIndex,rangeCount,fd_idSign);
+		String partPath = bpb.partFd(idSign,rangeIndex,fd);
 		
 		//保存块
-		part.save(fpathSvr,rangeFile);
-		folder  = true;
-	}
-	
-	//第一块数据
-	if(Long.parseLong(f_pos) == 0 )
-	{
-		//更新文件进度
-		f_svr.process(idSign,perSvr,lenSvr,rangeCount,rangeSize);
-	
+		up7.biz.file_part part = new up7.biz.file_part();
+		part.save(partPath,rangeFile);
+		
 		//更新文件夹进度
-		if(folder) f_svr.process(fd_idSign,fd_perSvr,fd_lenSvr,rangeCount,rangeSize);
+		if(f_pos == "0") cache.process(fd_idSign,fd_perSvr,fd_lenSvr,"0","0");
 	}
 	j.close();
 			

@@ -25,6 +25,8 @@ public class xdb_files {
 	public int idSvr=0;
 	//全局GUID
 	public String idSign="";
+	public String pidSign="";
+	public String rootSign="";
 	public String getIdSign(){return idSign;}
 	public void setIdSign(String v){this.idSign = v;}
 	
@@ -149,7 +151,6 @@ public class xdb_files {
 	public int 		getFilesComplete() {return filesComplete;}
 	public void 	setFilesComplete(int filesComplete) {this.filesComplete = filesComplete;	}
 
-	public String rootSign="";
 	//根级文件夹ID
     public int pidRoot=0;	
 	/**	 * 表示当前项是否是一个文件夹项。	 */
@@ -171,6 +172,8 @@ public class xdb_files {
 	public String pathSvr="";
 	/**	 * 文件在服务器中的相对路径。示例：/www/web/upload/md5.exe	 */
 	public String pathRel="";
+	//文件块目录 f:/webapps/files/年/月/日/guid/file-guid/
+	public String blockPath = "";
 	/**	 * 文件MD5	 */
 	public String md5="";
 	/**	 * 数字化的文件长度。以字节为单位，示例：120125	 */

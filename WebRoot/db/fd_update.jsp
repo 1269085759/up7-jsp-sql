@@ -1,5 +1,6 @@
 <%@ page language="java" import="up7.*" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@
+	page import="up7.biz.redis.*" %><%@
 	page import="org.apache.commons.lang.StringUtils" %><%
 
 String path = request.getContextPath();
@@ -23,6 +24,6 @@ if(		StringUtils.isBlank(lenSvr)
 }
 
 //文件夹进度
-up7.biz.redis.file f = new up7.biz.redis.file();
+FileRedis f = new FileRedis();
 f.process(idSign,perSvr,lenSvr,"0","0");
 %>

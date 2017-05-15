@@ -4,7 +4,8 @@
 	page import="redis.clients.jedis.Jedis" %><%@
 	page import="up7.biz.*" %><%@	
 	page import="up7.model.*" %><%@
-	page import="up7.biz.redis.*" %><%@ 
+	page import="up7.biz.redis.*" %><%@
+	page import="com.google.gson.Gson" %><%@ 
 	page import="org.apache.commons.lang.StringUtils" %><%@
 	page import="java.net.URLDecoder" %><%@
 	page import="java.net.URLEncoder" %><%/*
@@ -54,6 +55,9 @@ fileSvr.nameSvr = fileSvr.nameLoc;
 //所有单个文件均以guid方式存储
 PathGuidBuilder pb = new PathGuidBuilder();
 fileSvr.pathSvr = pb.genFile(fileSvr.uid,fileSvr);
+//文件块目录
+BlockPathBuilder bpb = new BlockPathBuilder();
+fileSvr.blockPath = bpb.root(idSign,fileSvr.pathSvr);
 
 //添加到redis
 Jedis j = JedisTool.con();
@@ -62,8 +66,8 @@ taskSvr.uid = uid;
 taskSvr.add(fileSvr);
 j.close();
 
-JSONObject obj = JSONObject.fromObject(fileSvr);
-String json = obj.toString();
+Gson gson = new Gson();
+String json = gson.toJson(fileSvr);
 json = URLEncoder.encode(json,"UTF-8");//编码，防止中文乱码
 json = json.replace("+","%20");
 json = callback + "({\"value\":\"" + json + "\"})";//返回jsonp格式数据。

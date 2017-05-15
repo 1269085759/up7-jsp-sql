@@ -1,5 +1,6 @@
 <%@ page language="java" import="up7.*" pageEncoding="UTF-8"%><%@
 	page contentType="text/html;charset=UTF-8"%><%@
+	page import="up7.biz.redis.*" %><%@
 	page import="org.apache.commons.lang.StringUtils" %><%
 
 /*
@@ -32,7 +33,7 @@ if (	StringUtils.isBlank(lenLoc)
 }
 
 //更新redis进度
-up7.biz.redis.file rf = new up7.biz.redis.file();
+FileRedis rf = new FileRedis();
 rf.process(idSign,perSvr,lenSvr,"0","0");
 %>
 
