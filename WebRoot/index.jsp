@@ -6,14 +6,14 @@ String clientCookie = request.getHeader("Cookie");
 <html>
   <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-    <title>HttpUploader6.2-SQL Server 2005演示页面</title>
-    <link href="js/up6.css" type="text/css" rel="Stylesheet"/>
+    <title>up7.1-SQL Server 2005演示页面</title>
+    <link href="js/up7.css" type="text/css" rel="Stylesheet"/>
     <script type="text/javascript" src="js/jquery-1.4.min.js"></script>
     <script type="text/javascript" src="js/json2.min.js" charset="utf-8"></script>
-    <script type="text/javascript" src="js/up6.config.js" charset="utf-8"></script>
-    <script type="text/javascript" src="js/up6.file.js" charset="utf-8"></script>
-    <script type="text/javascript" src="js/up6.folder.js" charset="utf-8"></script>
-    <script type="text/javascript" src="js/up6.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/up7.config.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/up7.file.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/up7.folder.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/up7.js" charset="utf-8"></script>
     <script language="javascript" type="text/javascript">
     	var cbMgr = new HttpUploaderMgr();
     	cbMgr.event.md5Complete = function (obj, md5) { /*alert(md5);*/ };
@@ -39,10 +39,10 @@ String clientCookie = request.getHeader("Cookie");
   </head>
   
   <body>
-	<p>up6.2多文件上传演示页面</p>
+	<p>up7.1多文件上传演示页面</p>
 	<p><a href="debug/redis-test.jsp" target="_blank">redis连接测试</a></p>
 	<p><a href="db/clear.jsp" target="_blank">清空数据库和缓存(redis)</a></p>
-	<p><a href="down2/index.htm" target="_blank">打开下载页面</a></p>
+	<p><a href="down3/index.htm" target="_blank">打开下载页面</a></p>
     <p>
         文件路径：<input id="filePath" type="text" size="50" value="D:\\360safe-inst.exe" />&nbsp;
         <input id="btnUpF" type="button" value="上传本地文件" />
