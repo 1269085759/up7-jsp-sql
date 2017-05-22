@@ -22,7 +22,6 @@
 		2017-05-05 取消添加数据库操作，在文件上传完后添加到数据库
 */
 
-String md5 			= request.getParameter("md5");
 String uid 			= request.getParameter("uid");
 String lenLoc 		= request.getParameter("lenLoc");//数字化的文件大小。12021
 String sizeLoc 		= request.getParameter("sizeLoc");//格式化的文件大小。10MB
@@ -33,8 +32,7 @@ pathLoc			= pathLoc.replace("+","%20");
 pathLoc			= URLDecoder.decode(pathLoc,"UTF-8");//utf-8解码
 
 //参数为空
-if (	StringUtils.isBlank(md5)
-	&& StringUtils.isBlank(uid)
+if (	StringUtils.isBlank(uid)
 	&& StringUtils.isBlank(sizeLoc))
 {
 	out.write(callback + "({\"value\":null})");
