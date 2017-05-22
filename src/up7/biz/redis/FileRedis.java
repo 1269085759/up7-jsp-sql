@@ -30,10 +30,10 @@ public class FileRedis
 		Jedis j = JedisTool.con();
 		j.hset(idSign, "perSvr", perSvr);
 		j.hset(idSign, "lenSvr", lenSvr);
-		if(!StringUtils.equals(blockCount,"0"))
+		if( !blockCount.equalsIgnoreCase("0"))
 		j.hset(idSign, "blockCount", blockCount);
 		
-		if(!StringUtils.equals(blockSize,"0"))
+		if( !blockSize.equalsIgnoreCase("0") )
 			j.hset(idSign, "blockSize", blockSize);
 	}
 	
@@ -59,6 +59,7 @@ public class FileRedis
 		j.hset(f.idSign, "lenLoc", Long.toString(f.lenLoc) );
 		j.hset(f.idSign, "lenSvr", "0" );
 		j.hset(f.idSign, "blockCount", Integer.toString(f.blockCount) );
+		j.hset(f.idSign, "blockSize", Integer.toString(f.blockSize) );
 		j.hset(f.idSign, "sizeLoc",f.sizeLoc);
 		j.hset(f.idSign, "filesCount", Integer.toString(f.filesCount) );
 		j.hset(f.idSign, "foldersCount", "0" );
