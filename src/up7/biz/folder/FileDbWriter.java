@@ -7,8 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
 import up7.biz.BlockMeger;
 import up7.biz.redis.FileRedis;
 import up7.model.xdb_files;
@@ -23,12 +21,15 @@ public class FileDbWriter
 	fd_root root;
 	Connection m_db;
 	Jedis m_cache;
+	//是否合并文件
+	Boolean autoMerge = true;
 	
-	public FileDbWriter(Connection con,Jedis j,fd_root fd)
+	public FileDbWriter(Connection con,Jedis j,fd_root fd,Boolean merge)
 	{
 		this.m_cache = j;
 		this.m_db = con;
 		this.root = fd;
+		this.autoMerge = merge;
 	}
 	
 	PreparedStatement makeCmd(Connection con) throws SQLException
@@ -53,6 +54,7 @@ public class FileDbWriter
         sb.append(",f_fdTask");
         sb.append(",f_blockCount");
         sb.append(",f_blockSize");
+        sb.append(",f_blockPath");
         
         sb.append(") values(");
         
@@ -74,6 +76,7 @@ public class FileDbWriter
         sb.append(",?");//f_fdTask
         sb.append(",?");//f_blockCount
         sb.append(",?");//f_blockSize
+        sb.append(",?");//f_blockPath
         sb.append(")");
 
         PreparedStatement cmd = con.prepareStatement(sb.toString());
@@ -94,6 +97,7 @@ public class FileDbWriter
         cmd.setBoolean(15, false);//fdTask
         cmd.setInt(16, 1);
         cmd.setInt(17, 0);
+        cmd.setString(18, "");//blockPath
         return cmd;
 	}
 	
@@ -104,7 +108,7 @@ public class FileDbWriter
 	        cmd.setString(1, f.idSign);//idSign
 	        cmd.setString(2, f.pidSign);//pidSign
 	        cmd.setString(3, f.rootSign);//rootSign
-	        cmd.setBoolean(4, f.f_fdChild);//fdChild
+	        cmd.setBoolean(4, f.child);//fdChild
 	        cmd.setInt(5, f.uid);//uid
 	        cmd.setString(6, f.nameLoc);//nameLoc
 	        cmd.setString(7, f.nameSvr);//nameSvr
@@ -118,6 +122,7 @@ public class FileDbWriter
 	        cmd.setBoolean(15, f.f_folder);//fdTask
 	        cmd.setInt(16, f.blockCount);//blockCount
 	        cmd.setInt(17, f.blockSize);//blockSize
+	        cmd.setString(18, f.blockPath);//blockPath
 	        cmd.execute();	
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -151,14 +156,18 @@ public class FileDbWriter
 			for(String k : keys)
 			{
 				xdb_files f = svr.read(k);
+				f.child = true;//
 				this.save(cmd, f);
 				files.add(f);
 			}
 			
 			//合并文件
-			for(xdb_files f : files)
+			if(this.autoMerge)
 			{
-				bm.merge(f);	
+				for(xdb_files f : files)
+				{
+					bm.merge(f);	
+				}
 			}
 			files.clear();
 			keys.clear();

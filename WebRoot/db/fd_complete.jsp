@@ -14,6 +14,7 @@ String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.
 
 String sign	= request.getParameter("idSign");
 String uid	= request.getParameter("uid");
+String merge= request.getParameter("merge");
 String cbk 	= request.getParameter("callback");//jsonp
 int ret = 0;
 
@@ -22,6 +23,7 @@ if (	!StringUtils.isBlank(sign))
 {
 	Jedis j = JedisTool.con();
 	fd_redis fd = new fd_redis(j);
+	fd.autoMerge = merge.equalsIgnoreCase("1");
 	fd.read(sign);
 	fd.saveToDb();//保存到数据库
 	

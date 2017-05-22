@@ -21,6 +21,7 @@
 		2015-05-13 创建
 		2017-05-06 增加业务逻辑数据，简化处理逻辑
 		2017-05-14 优化逻辑
+		2017-05-21 支持下载文件块（未合并）
 */
 String path = request.getContextPath();
 String basePath = request.getScheme()+"://"+request.getServerName()+":"+request.getServerPort()+path+"/";
@@ -30,8 +31,9 @@ String nameLoc 		= request.getHeader("f-nameLoc");
 String sizeSvr 		= request.getHeader("f-sizeSvr");
 String pathSvr 		= request.getHeader("f-pathSvr");
 String pathLoc 		= request.getHeader("f-pathLoc");
+String blockPath 	= request.getHeader("f-blockPath");
 String blockIndex 	= request.getHeader("f-blockIndex");//基于1
-String fileOffset	= request.getHeader("f-fileOffset");
+String blockOffset	= request.getHeader("f-blockOffset");
 String blockSize	= request.getHeader("f-blockSize");//逻辑块大小
 String rangeSize	= request.getHeader("f-rangeSize");//当前请求的块大小
 String lenLoc 		= request.getHeader("f-lenLoc");
@@ -41,14 +43,11 @@ String percent		= request.getHeader("f-percent");
 String fd_signSvr 	= request.getHeader("fd-signSvr");
 String fd_lenLoc 	= request.getHeader("fd-lenLoc");
 String fd_sizeLoc 	= request.getHeader("fd-sizeLoc");
-String fd_percent	= request.getHeader("fd-percent");
+String fd_percent 	= request.getHeader("fd-percent");
 
-pathSvr	 = pathSvr.replaceAll("\\+","%20");
-pathLoc	 = pathLoc.replaceAll("\\+","%20");
-nameLoc	 = nameLoc.replaceAll("\\+","%20");
-pathSvr	 = URLDecoder.decode(pathSvr,"UTF-8");//utf-8解码
-pathLoc	 = URLDecoder.decode(pathLoc,"UTF-8");//utf-8解码
-nameLoc	 = URLDecoder.decode(nameLoc,"UTF-8");//utf-8解码
+blockPath= PathTool.url_decode(blockPath);
+pathSvr	 = PathTool.url_decode(pathSvr);
+pathLoc	 = PathTool.url_decode(pathLoc);
 
 if (	StringUtils.isEmpty(lenSvr)
 	//||	StringUtils.isEmpty(sizeSvr)
@@ -93,8 +92,9 @@ else
 	fr.process(fd_signSvr,fd_percent,fd_lenLoc);
 	j.close();
 }
-
-RandomAccessFile raf = new RandomAccessFile(pathSvr,"r");
+String partPath = PathTool.combine(blockPath,blockIndex.concat(".part"));
+System.out.println(partPath);
+RandomAccessFile raf = new RandomAccessFile(partPath,"r");
 FileInputStream in = new FileInputStream( raf.getFD() );
 
 long dataToRead = Long.parseLong(rangeSize);
@@ -112,7 +112,7 @@ OutputStream os = null;
 try
 {
 	os = response.getOutputStream();
-	long offset_begin = Long.parseLong(fileOffset);
+	long offset_begin = Long.parseLong(blockOffset);
 	in.skip(offset_begin);//定位索引
 	
 	byte[] buffer = new byte[1048576];//1MB

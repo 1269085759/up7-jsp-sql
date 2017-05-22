@@ -67,10 +67,10 @@ public class xdb_files {
 		f_fdID = fFdID;
 	}
 	public boolean isF_fdChild() {
-		return f_fdChild;
+		return child;
 	}
 	public void setF_fdChild(boolean fFdChild) {
-		f_fdChild = fFdChild;
+		child = fFdChild;
 	}
 	public int getUid() {
 		return uid;
@@ -162,7 +162,7 @@ public class xdb_files {
 	/**	 * 与xdb_folders.fd_id对应	 */
 	public int f_fdID=0;
 	//	/// 是否是文件夹中的子文件	/// </summary>
-	public boolean f_fdChild=false;
+	public boolean child=false;
 	/**	 * 用户ID。与第三方系统整合使用。	 */
 	public int uid=0;
 	/**	 * 文件在本地电脑中的名称	 */
@@ -194,6 +194,7 @@ public class xdb_files {
 	public Date PostedTime = new Date();
 	public boolean deleted=false;
 	public String sign = "";
+	public String signSvr = UUID.randomUUID().toString();//服务端生成，唯一标识
 	/**	 * 文件夹JSON信息	 */
 	public String fd_json="";	
 	public int filesCount=0;//add(2015-03-18):供JS调用
