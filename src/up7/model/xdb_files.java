@@ -51,10 +51,14 @@ public class xdb_files {
 		this.pidRoot = pidRoot;
 	}
 	public boolean isF_fdTask() {
-		return f_fdTask;
+		return f_folder;
 	}
-	public void setF_fdTask(boolean fFdTask) {
-		f_fdTask = fFdTask;
+	public void setF_folder(boolean fFdTask) {
+		f_folder = fFdTask;
+	}
+	public boolean getF_folder()
+	{
+		return this.f_folder;
 	}
 	public int getF_fdID() {
 		return f_fdID;
@@ -154,7 +158,7 @@ public class xdb_files {
 	//根级文件夹ID
     public int pidRoot=0;	
 	/**	 * 表示当前项是否是一个文件夹项。	 */
-	public boolean f_fdTask=false;
+	public boolean f_folder=false;
 	/**	 * 与xdb_folders.fd_id对应	 */
 	public int f_fdID=0;
 	//	/// 是否是文件夹中的子文件	/// </summary>

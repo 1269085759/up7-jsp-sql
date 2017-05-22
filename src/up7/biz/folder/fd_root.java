@@ -11,6 +11,6 @@ public class fd_root extends fd_child
     public fd_root()
     {
     	this.f_fdChild = false;
-    	this.f_fdTask = true;
+    	this.f_folder = true;
     }
 }

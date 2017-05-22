@@ -113,7 +113,7 @@ public class DBFile {
             {
                 xdb_files f = new xdb_files();
                 f.idSvr 	= r.getInt(1);
-                f.f_fdTask 	= r.getBoolean(2);
+                f.f_folder 	= r.getBoolean(2);
                 f.f_fdID 	= r.getInt(3);
                 f.nameLoc 	= r.getString(4);
                 f.pathLoc 	= r.getString(5);
@@ -166,7 +166,7 @@ public class DBFile {
 				xdb_files f 	= new xdb_files();
 				f.uid			= f_uid;
 				f.idSvr 		= r.getInt(1);
-				f.f_fdTask 		= r.getBoolean(2);
+				f.f_folder 		= r.getBoolean(2);
 				f.f_fdID 		= r.getInt(3);
 				f.nameLoc 		= r.getString(4);
 				f.pathLoc 		= r.getString(5);
@@ -199,7 +199,7 @@ public class DBFile {
 		for(xdb_files f : files)
 		{
 			//是文件夹任务=>取文件夹JSON
-			if (f.f_fdTask)
+			if (f.f_folder)
 			{
 				FolderInf fd = new FolderInf();
 				f.fd_json = DBFolder.GetFilesUnComplete(f.f_fdID,fd);
@@ -495,11 +495,12 @@ public class DBFile {
 		sb.append(",f_pathSvr");//6		
 		sb.append(",f_lenLoc");//7
 		sb.append(",f_lenSvr");//8
-		sb.append(",f_perSvr");//9
-		sb.append(",f_sizeLoc");//10
-		sb.append(",f_complete");//11
-		sb.append(",f_blockCount");//12
-		sb.append(",f_blockSize");//13
+		sb.append(",f_perSvr");//
+		sb.append(",f_sizeLoc");//9
+		sb.append(",f_complete");//
+		sb.append(",f_blockCount");//10
+		sb.append(",f_blockSize");//11
+		sb.append(",f_blockPath");//12
 		
 		sb.append(") values(");
 				
@@ -516,6 +517,7 @@ public class DBFile {
 		sb.append(",1");//sb.append(",@f_complete");
 		sb.append(",?");//sb.append(",@f_blockCount");
 		sb.append(",?");//sb.append(",@f_blockSize");
+		sb.append(",?");//sb.append(",@f_blockPath");
 		sb.append(")");
 
 		DbHelper db = new DbHelper();
@@ -532,6 +534,7 @@ public class DBFile {
 			cmd.setString(9, inf.lenLoc>1024 ? inf.sizeLoc : PathTool.getDataSize(inf.lenLoc));
 			cmd.setInt(10, inf.blockCount);
 			cmd.setInt(11,inf.blockSize);
+			cmd.setString(12,inf.blockPath);
 			cmd.execute();
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

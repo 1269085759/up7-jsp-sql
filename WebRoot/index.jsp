@@ -10,6 +10,8 @@ String clientCookie = request.getHeader("Cookie");
     <link href="js/up7.css" type="text/css" rel="Stylesheet"/>
     <script type="text/javascript" src="js/jquery-1.4.min.js"></script>
     <script type="text/javascript" src="js/json2.min.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/up7.app.js" charset="utf-8"></script>
+    <script type="text/javascript" src="js/up7.edge.js" charset="utf-8"></script>
     <script type="text/javascript" src="js/up7.config.js" charset="utf-8"></script>
     <script type="text/javascript" src="js/up7.file.js" charset="utf-8"></script>
     <script type="text/javascript" src="js/up7.folder.js" charset="utf-8"></script>
@@ -27,12 +29,12 @@ String clientCookie = request.getHeader("Cookie");
             //上传指定文件
             $("#btnUpF").click(function () {
                 var path = $("#filePath").val();
-                cbMgr.browser.addFile({ pathLoc: path });
+                cbMgr.app.addFile({ pathLoc: path });
             });
             //上传指定目录
             $("#btnUpFd").click(function () {
                 var path = $("#folderPath").val();
-                cbMgr.browser.addFolder({ pathLoc: path });
+                cbMgr.app.addFolder({ pathLoc: path });
             });
         });
     </script>
