@@ -28,10 +28,10 @@ String cbk 		= request.getParameter("callback");
 String signSvr	= request.getParameter("signSvr");
 String nameLoc	= request.getParameter("nameLoc");
 String pathLoc	= request.getParameter("pathLoc");
-nameLoc		 	= nameLoc.replace("+","%20");
-nameLoc			= URLDecoder.decode(nameLoc,"UTF-8");
-pathLoc		 	= pathLoc.replace("+","%20");
-pathLoc			= URLDecoder.decode(pathLoc,"UTF-8");
+String sizeSvr	= request.getParameter("sizeSvr");
+nameLoc		 	= PathTool.url_decode(nameLoc);
+pathLoc		 	= PathTool.url_decode(pathLoc);
+sizeSvr		 	= PathTool.url_decode(sizeSvr);
 
 if ( !StringUtils.isBlank(uid)
 	|| !StringUtils.isBlank(nameLoc)
@@ -42,6 +42,7 @@ if ( !StringUtils.isBlank(uid)
 	fd.nameLoc = nameLoc;
 	fd.pathLoc = pathLoc;
 	fd.signSvr = signSvr;
+	fd.fdTask = true;
 	
 	Jedis j = JedisTool.con();
 	tasks svr = new tasks(uid,j);

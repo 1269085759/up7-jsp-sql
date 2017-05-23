@@ -51,6 +51,14 @@
     {
         this.browser.addFolder(this.fileSvr);
     };
+    
+    this.add_end = function(json)
+    {
+    	//续传不初始化
+    	if(this.fileSvr.lenLoc > 1) return;
+    	jQuery.extend(this.fileSvr,json);
+    	this.svr_create();
+    };
 
     //方法-开始下载
     this.down = function ()
@@ -59,7 +67,7 @@
         this.ui.btn.stop.show();
         this.ui.msg.text("开始连接服务器...");
         this.State = HttpDownloaderState.Posting;        
-        this.browser.addFolder(this.fileSvr);
+        //this.browser.addFolder(this.fileSvr);
         this.Manager.start_queue();//下载队列
     };
 
@@ -96,18 +104,9 @@
 
     //在出错，停止中调用
     this.svr_update = function (json)
-    {
-        if (this.fileSvr.idSvr == 0) return;
-
+    {       
         var param = jQuery.extend({}, this.fields, { time: new Date().getTime() });
-        jQuery.extend(param, { idSvr: this.fileSvr.idSvr, lenLoc: this.fileSvr.lenLoc, perLoc: this.fileSvr.perLoc });
-
-        if (json != null)
-        {
-            //子文件
-            var f = this.fileSvr.files[json.file.id];
-            jQuery.extend(param, { file_id: f.idSvr, file_lenLoc: f.lenLoc, file_per: f.perLoc });
-        }
+        jQuery.extend(param, { signSvr: this.fileSvr.signSvr, lenLoc: this.fileSvr.lenLoc, perLoc: this.fileSvr.perLoc });
 
         $.ajax({
             type: "GET"
@@ -129,6 +128,7 @@
         var param = jQuery.extend({}, this.fields, { time: new Date().getTime() });
         jQuery.extend(param, { nameLoc: encodeURIComponent(this.fileSvr.nameLoc) });
         jQuery.extend(param, { pathLoc: encodeURIComponent(this.fileSvr.pathLoc) });
+        jQuery.extend(param, { sizeSvr: encodeURIComponent(this.fileSvr.sizeSvr) });
         jQuery.extend(param, { signSvr: this.fileSvr.signSvr});
         var ptr = this;
         $.ajax({
@@ -240,7 +240,6 @@
     //更新服务器进度
     this.down_part = function (json)
     {
-        //this.svr_update(json);//更新频繁，对服务器会造成较大压力。考虑做优化。
     };
 
     this.init_end = function (json)

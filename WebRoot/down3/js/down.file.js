@@ -75,6 +75,14 @@ function FileDownloader(fileLoc, mgr)
     {
         this.browser.addFile(this.fileSvr);
     };
+    
+    this.add_end = function(json)
+    {
+    	//续传不初始化
+    	if(this.fileSvr.lenLoc > 1) return;
+    	jQuery.extend(this.fileSvr,json);
+    	this.svr_create();//
+    };
 
     //方法-开始下载
     this.down = function ()
@@ -83,7 +91,7 @@ function FileDownloader(fileLoc, mgr)
         this.ui.btn.stop.show();
         this.ui.msg.text("开始连接服务器...");
         this.State = HttpDownloaderState.Posting;
-        this.browser.addFile(this.fileSvr);
+        //this.browser.addFile(this.fileSvr);
         this.Manager.start_queue();//下载队列
     };
 
@@ -121,8 +129,6 @@ function FileDownloader(fileLoc, mgr)
     //在出错，停止中调用
     this.svr_update = function ()
     {
-        if (this.fileSvr.idSvr == 0) return;
-
         var param = jQuery.extend({}, this.fields, this.fileSvr, { time: new Date().getTime() });
         $.ajax({
             type: "GET"
@@ -139,8 +145,6 @@ function FileDownloader(fileLoc, mgr)
     //在服务端创建一个数据，用于记录下载信息，一般在HttpDownloader_BeginDown中调用
     this.svr_create = function ()
     {
-        //已记录将不再记录
-        if (this.fileSvr.idSvr) return;
         var param = jQuery.extend({}, this.fields, this.fileSvr, { time: new Date().getTime() });
         jQuery.extend(param, {pathLoc:encodeURIComponent(this.fileSvr.pathLoc),nameLoc:encodeURIComponent(this.fileSvr.nameLoc)});
 
@@ -173,11 +177,7 @@ function FileDownloader(fileLoc, mgr)
             , jsonp: "callback" //自定义的jsonp回调函数名称，默认为jQuery自动生成的随机函数名
             , url: _this.Config["UrlDel"]
             , data: param
-            , success: function (json)
-            {
-                //_this.fileSvr.idSvr = json.idSvr;
-                //_this.fileSvr.uid = json.uid;
-            }
+            , success: function (json){}
             , error: function (req, txt, err) { alert("删除数据错误！" + req.responseText); }
             , complete: function (req, sta) { req = null; }
         });
