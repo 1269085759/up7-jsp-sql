@@ -22,9 +22,8 @@ public class fd_page
 		Integer index = Integer.parseInt(pageIndex);
 		Integer pageStart = ((index-1) * pageSize) + 1;
 		Integer pageEnd = index * pageSize;
-		String sqlData = "select f_nameLoc,f_pathLoc,f_pathSvr,f_pathRel,f_blockPath,f_blockSize,f_lenLoc,f_sizeLoc from up7_files where f_rootSign='"+id+"'";
-        String sql = String.format("select * from (select a.*, rownum rn from (%s) a where rownum <= %d) where rn >= %d",sqlData,pageEnd,pageStart);
-
+		String sql = String.format("select * from (select f_nameLoc,f_pathLoc,f_pathSvr,f_pathRel,f_blockPath,f_blockSize,f_lenLoc,f_sizeLoc,ROW_NUMBER() OVER(Order by (select null) ) as RowNumber from up7_files where f_rootSign='%s')a where RowNumber BETWEEN %d and %d", id, pageStart, pageEnd);
+		
         List<xdb_files> files = new ArrayList<xdb_files>();
         DbHelper db = new DbHelper();
         PreparedStatement cmd = db.GetCommand(sql);        
