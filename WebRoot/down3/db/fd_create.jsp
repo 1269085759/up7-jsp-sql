@@ -42,7 +42,7 @@ if ( !StringUtils.isBlank(uid)
 	fd.nameLoc = nameLoc;
 	fd.pathLoc = pathLoc;
 	fd.signSvr = signSvr;
-	fd.fdTask = true;
+	fd.folder = true;
 	
 	Jedis j = JedisTool.con();
 	tasks svr = new tasks(uid,j);
