@@ -44,7 +44,7 @@ public class DnFileInf
     /// </summary>
     public String nameLoc ="";
       
-    public Boolean fdTask =false;
+    public Boolean folder =false;
       
     public int fdID =0;
       
@@ -121,10 +121,10 @@ public class DnFileInf
 		this.nameLoc = nameLoc;
 	}
 	public Boolean getFdTask() {
-		return fdTask;
+		return folder;
 	}
 	public void setFdTask(Boolean fdTask) {
-		this.fdTask = fdTask;
+		this.folder = fdTask;
 	}
 	public int getFdID() {
 		return fdID;

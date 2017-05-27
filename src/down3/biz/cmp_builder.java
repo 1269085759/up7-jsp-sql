@@ -78,7 +78,7 @@ public class cmp_builder {
         cmp_file f = new cmp_file();
         f.read(0, r);
 
-        if (f.fdTask)
+        if (f.folder)
         {
             int fd_index = 0;
             //文件夹已存在
@@ -94,7 +94,7 @@ public class cmp_builder {
                 fd.lenSvr = f.lenSvr;
                 fd.sizeSvr = f.sizeSvr;
                 fd.perLoc = f.perLoc;
-                fd.fdTask = true;
+                fd.folder = true;
                 fd.fdID = f.fdID;
             }//文件夹不存在
             else
