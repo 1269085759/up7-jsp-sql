@@ -108,12 +108,11 @@ if ( 	StringUtils.isBlank( lenSvr )
 		
 		//生成文件块路径
 		BlockPathBuilder bpb = new BlockPathBuilder();
-		String partPath = bpb.part(idSign,rangeIndex,fileSvr.pathSvr);
-		String ps = cache.getPartPath(idSign, rangeIndex);
+		String partPath = bpb.part(idSign,rangeIndex,fileSvr.pathSvr);		
 		
 		//保存文件块
 		up7.biz.file_part part = new up7.biz.file_part();
-		part.save(ps,rangeFile);
+		part.save(partPath,rangeFile);
 		
 		//更新文件进度
 		if( f_pos.equalsIgnoreCase("0") ) cache.process(idSign,perSvr,lenSvr,rangeCount,rangeSize);
